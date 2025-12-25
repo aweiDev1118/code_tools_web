@@ -4,7 +4,7 @@ import { Marked } from 'marked'
 import { markedHighlight } from 'marked-highlight'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
-import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const marked = new Marked(
   markedHighlight({
@@ -56,22 +56,12 @@ const output = computed(() => {
   }
 })
 
-const copy = async () => {
-  try {
-    await navigator.clipboard.writeText(input.value)
-    ElMessage.success('已复制 Markdown 源码')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+const copy = () => {
+  copyToClipboard(input.value, '已复制 Markdown 源码')
 }
 
-const copyHtml = async () => {
-  try {
-    await navigator.clipboard.writeText(output.value)
-    ElMessage.success('已复制 HTML')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+const copyHtml = () => {
+  copyToClipboard(output.value, '已复制 HTML')
 }
 
 const clear = () => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
-import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const count = ref(5)
 const uppercase = ref(false)
@@ -23,23 +23,13 @@ const generate = () => {
   uuids.value = result
 }
 
-const copy = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success('已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+const copy = (text: string) => {
+  copyToClipboard(text)
 }
 
-const copyAll = async () => {
+const copyAll = () => {
   if (!uuids.value.length) return
-  try {
-    await navigator.clipboard.writeText(uuids.value.join('\n'))
-    ElMessage.success('已复制全部')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+  copyToClipboard(uuids.value.join('\n'), '已复制全部')
 }
 
 // 初始化生成

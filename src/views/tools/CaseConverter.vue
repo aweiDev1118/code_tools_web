@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const input = ref('')
 
@@ -17,13 +18,8 @@ const conversions = [
   { id: 'toggle', name: '大小写反转', transform: (s: string) => s.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join('') },
 ]
 
-const copy = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success('已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+const copy = (text: string) => {
+  copyToClipboard(text)
 }
 
 const applyConversion = (transform: (s: string) => string) => {

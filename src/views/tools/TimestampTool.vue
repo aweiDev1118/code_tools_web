@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const currentTimestamp = ref(Date.now())
 const timestampInput = ref('')
@@ -45,13 +45,8 @@ const dateToTimestamp = computed(() => {
   return unit.value === 's' ? d.unix().toString() : d.valueOf().toString()
 })
 
-const copyText = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success('已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+const copyText = (text: string) => {
+  copyToClipboard(text)
 }
 
 const setNow = () => {

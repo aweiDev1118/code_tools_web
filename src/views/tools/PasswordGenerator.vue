@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const length = ref(16)
 const count = ref(5)
@@ -50,23 +51,13 @@ const generate = () => {
   passwords.value = result
 }
 
-const copy = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success('已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+const copy = (text: string) => {
+  copyToClipboard(text)
 }
 
-const copyAll = async () => {
+const copyAll = () => {
   if (!passwords.value.length) return
-  try {
-    await navigator.clipboard.writeText(passwords.value.join('\n'))
-    ElMessage.success('已复制全部')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+  copyToClipboard(passwords.value.join('\n'), '已复制全部')
 }
 
 const strength = computed(() => {

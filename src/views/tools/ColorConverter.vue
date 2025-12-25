@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const hexColor = ref('#3b82f6')
 
@@ -75,13 +75,8 @@ const hslString = computed(() => {
   return `hsl(${hsl.value.h}, ${hsl.value.s}%, ${hsl.value.l}%)`
 })
 
-const copy = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success('已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+const copy = (text: string) => {
+  copyToClipboard(text)
 }
 
 const colorFormats = computed(() => [

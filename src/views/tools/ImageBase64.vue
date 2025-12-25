@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const mode = ref<'toBase64' | 'toImage'>('toBase64')
 const base64Output = ref('')
@@ -41,15 +41,10 @@ const handleBase64Input = () => {
   imagePreview.value = base64
 }
 
-const copy = async () => {
+const copy = () => {
   const text = mode.value === 'toBase64' ? base64Output.value : base64Input.value
   if (!text) return
-  try {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success('已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+  copyToClipboard(text)
 }
 
 const download = () => {

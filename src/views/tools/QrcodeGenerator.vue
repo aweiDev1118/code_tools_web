@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import QRCode from 'qrcode'
 import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const input = ref('https://example.com')
 const qrcodeUrl = ref('')
@@ -40,16 +41,20 @@ const download = () => {
 
 const copyImage = async () => {
   if (!qrcodeUrl.value) return
-  try {
-    const response = await fetch(qrcodeUrl.value)
-    const blob = await response.blob()
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'image/png': blob })
-    ])
-    ElMessage.success('已复制图片')
-  } catch {
-    ElMessage.error('复制失败')
+  // 图片复制需要特殊处理，尝试使用 Clipboard API
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      const response = await fetch(qrcodeUrl.value)
+      const blob = await response.blob()
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob })
+      ])
+      ElMessage.success('已复制图片')
+      return
+    } catch { }
   }
+  // 降级方案：复制 Base64 字符串
+  copyToClipboard(qrcodeUrl.value, '已复制图片数据')
 }
 
 watch([input, size, errorLevel, darkColor, lightColor], generateQRCode, { immediate: true })

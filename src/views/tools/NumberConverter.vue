@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const decimal = ref('')
 const binary = ref('')
@@ -47,14 +48,9 @@ watch(hex, (val) => {
   if (activeField.value === 'hex') convert(val, 16)
 })
 
-const copy = async (text: string) => {
+const copy = (text: string) => {
   if (!text) return
-  try {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success('已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+  copyToClipboard(text)
 }
 
 const clear = () => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import dayjs from 'dayjs'
-import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const input = ref('')
 
@@ -48,13 +48,8 @@ const decoded = computed(() => {
   }
 })
 
-const copy = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success('已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+const copy = (text: string) => {
+  copyToClipboard(text)
 }
 
 const clear = () => {

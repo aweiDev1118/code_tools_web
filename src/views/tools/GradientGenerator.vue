@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ElMessage } from 'element-plus'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const gradientType = ref<'linear' | 'radial'>('linear')
 const angle = ref(90)
@@ -40,13 +40,8 @@ const applyPreset = (preset: { colors: string[] }) => {
   color3.value = preset.colors[2] || ''
 }
 
-const copy = async () => {
-  try {
-    await navigator.clipboard.writeText(cssCode.value)
-    ElMessage.success('CSS 已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
+const copy = () => {
+  copyToClipboard(cssCode.value, 'CSS 已复制')
 }
 
 const randomGradient = () => {
