@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { categories, getToolsByCategory } from '@/config/tools'
 
@@ -8,6 +9,19 @@ defineProps<{
 
 const route = useRoute()
 const router = useRouter()
+
+// 记录每个分类的展开状态，默认全部折叠
+const expandedCategories = ref<Record<string, boolean>>(
+  Object.fromEntries(categories.map(c => [c.id, false]))
+)
+
+const toggleCategory = (categoryId: string) => {
+  expandedCategories.value[categoryId] = !expandedCategories.value[categoryId]
+}
+
+const isCategoryExpanded = (categoryId: string) => {
+  return expandedCategories.value[categoryId]
+}
 
 const goToTool = (toolId: string) => {
   router.push(`/tool/${toolId}`)
@@ -38,25 +52,34 @@ const isCategoryActive = (categoryId: string) => {
 
       <!-- Categories -->
       <div v-for="category in categories" :key="category.id" class="nav-group">
-        <div class="nav-group-header" :class="{ active: isCategoryActive(category.id) }">
+        <div
+          class="nav-group-header"
+          :class="{ active: isCategoryActive(category.id), expanded: isCategoryExpanded(category.id) }"
+          @click="toggleCategory(category.id)"
+        >
           <div class="nav-icon">
             <el-icon size="18"><component :is="category.icon" /></el-icon>
           </div>
           <span v-if="!collapsed" class="nav-text">{{ category.name }}</span>
+          <el-icon v-if="!collapsed" class="expand-icon" size="14">
+            <ArrowDown />
+          </el-icon>
         </div>
 
-        <div v-if="!collapsed" class="nav-group-items">
-          <div
-            v-for="tool in getToolsByCategory(category.id)"
-            :key="tool.id"
-            class="nav-sub-item"
-            :class="{ active: isToolActive(tool.id) }"
-            @click="goToTool(tool.id)"
-          >
-            <span class="nav-dot"></span>
-            <span class="nav-text">{{ tool.name }}</span>
+        <Transition name="collapse">
+          <div v-if="!collapsed && isCategoryExpanded(category.id)" class="nav-group-items">
+            <div
+              v-for="tool in getToolsByCategory(category.id)"
+              :key="tool.id"
+              class="nav-sub-item"
+              :class="{ active: isToolActive(tool.id) }"
+              @click.stop="goToTool(tool.id)"
+            >
+              <span class="nav-dot"></span>
+              <span class="nav-text">{{ tool.name }}</span>
+            </div>
           </div>
-        </div>
+        </Transition>
       </div>
     </div>
 
@@ -116,6 +139,24 @@ const isCategoryActive = (categoryId: string) => {
   text-decoration: none;
   color: #64748b;
   margin-bottom: 4px;
+}
+
+.nav-group-header {
+  position: relative;
+}
+
+.expand-icon {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+  opacity: 0.6;
+}
+
+.nav-group-header.expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
+.nav-group-header:hover .expand-icon {
+  opacity: 1;
 }
 
 .nav-item:hover,
@@ -280,5 +321,26 @@ const isCategoryActive = (categoryId: string) => {
 
 .collapsed .nav-group-items {
   display: none;
+}
+
+/* Collapse transition */
+.collapse-enter-active,
+.collapse-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-10px);
+}
+
+.collapse-enter-to,
+.collapse-leave-from {
+  opacity: 1;
+  max-height: 500px;
+  transform: translateY(0);
 }
 </style>

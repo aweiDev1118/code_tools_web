@@ -107,7 +107,7 @@ const hideResults = () => {
             <component :is="isDark ? 'Sunny' : 'Moon'" />
           </el-icon>
         </button>
-        <a href="https://github.com" target="_blank" class="action-btn">
+        <a href="https://github.com/aweiDev1118/code_tools_web" target="_blank" class="action-btn">
           <el-icon size="20"><Link /></el-icon>
         </a>
       </div>
