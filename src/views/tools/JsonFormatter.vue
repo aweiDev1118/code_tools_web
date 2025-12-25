@@ -133,3 +133,53 @@ const loadSample = () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* iPhone 适配 */
+@media (max-width: 430px) {
+  .mb-6 h1 {
+    font-size: 20px !important;
+  }
+
+  .mb-6 p {
+    font-size: 13px !important;
+  }
+
+  .mb-4 {
+    margin-bottom: 12px !important;
+  }
+
+  .mb-4 .el-button {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  .ml-auto {
+    margin-left: 0 !important;
+    width: 100%;
+    margin-top: 8px;
+    justify-content: flex-start !important;
+  }
+
+  .gap-4 {
+    gap: 12px !important;
+  }
+
+  :deep(.el-textarea__inner) {
+    min-height: 200px !important;
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 375px) {
+  .mb-4 .el-button {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+
+  :deep(.el-textarea__inner) {
+    min-height: 180px !important;
+    font-size: 13px !important;
+  }
+}
+</style>

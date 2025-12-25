@@ -290,23 +290,217 @@ import ToolCard from '@/components/common/ToolCard.vue'
   gap: 16px;
 }
 
-@media (max-width: 768px) {
+/* ========================================
+   iPhone 适配 (iPhone 12-17 全系列)
+   ======================================== */
+
+/* 通用移动端 */
+@media (max-width: 430px) {
+  .home-container {
+    padding: 0;
+  }
+
+  .hero-section {
+    padding: 28px 16px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+  }
+
+  .hero-badge {
+    font-size: 12px;
+    padding: 6px 12px;
+    margin-bottom: 16px;
+  }
+
   .hero-title {
-    font-size: 32px;
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+
+  .hero-desc {
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
   }
 
   .hero-stats {
-    flex-direction: column;
-    gap: 16px;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 8px;
+    padding: 16px 12px;
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .stat-item {
+    flex: 1;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+
+  .stat-label {
+    font-size: 11px;
   }
 
   .stat-divider {
+    width: 1px;
+    height: 32px;
+  }
+
+  .tools-section {
+    gap: 16px;
+  }
+
+  .category-block {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .category-header {
+    flex-wrap: nowrap;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .category-icon {
     width: 40px;
-    height: 1px;
+    height: 40px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .category-title {
+    font-size: 16px;
+    flex: 1;
+  }
+
+  .category-count {
+    font-size: 11px;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+
+  .category-more {
+    display: none;
   }
 
   .tools-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* iPhone mini (375px) */
+@media (max-width: 375px) {
+  .hero-section {
+    padding: 24px 14px;
+  }
+
+  .hero-title {
+    font-size: 24px;
+  }
+
+  .hero-desc {
+    font-size: 13px;
+  }
+
+  .hero-stats {
+    padding: 14px 10px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .category-block {
+    padding: 12px;
+  }
+
+  .category-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .category-title {
+    font-size: 15px;
+  }
+
+  .tools-grid {
+    gap: 8px;
+  }
+}
+
+/* iPhone Pro Max / Plus (428-430px) */
+@media (min-width: 428px) and (max-width: 430px) {
+  .hero-section {
+    padding: 32px 20px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .category-block {
+    padding: 18px;
+  }
+
+  .category-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .tools-grid {
+    gap: 12px;
+  }
+}
+
+/* 横屏模式 */
+@media (max-width: 844px) and (orientation: landscape) {
+  .hero-section {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-size: 22px;
+  }
+
+  .hero-desc {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .hero-stats {
+    flex-direction: row;
+    gap: 16px;
+    padding: 12px 16px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .tools-section {
+    gap: 12px;
+  }
+
+  .category-block {
+    padding: 12px;
+  }
+
+  .tools-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 }
 </style>

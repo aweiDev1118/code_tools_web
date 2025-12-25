@@ -188,4 +188,120 @@ defineProps<{
   background: rgba(99, 102, 241, 0.2);
   color: #a5b4fc;
 }
+
+/* ========================================
+   iPhone 适配 (iPhone 12-17 全系列)
+   ======================================== */
+
+@media (max-width: 430px) {
+  .tool-card {
+    padding: 14px;
+    border-radius: 12px;
+    min-height: 72px;
+  }
+
+  .tool-card:hover {
+    transform: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .tool-card:active {
+    transform: scale(0.98);
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  .card-content {
+    gap: 12px;
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .card-arrow {
+    display: none;
+  }
+
+  .card-glow {
+    display: none;
+  }
+}
+
+/* iPhone mini (375px) */
+@media (max-width: 375px) {
+  .tool-card {
+    padding: 12px;
+    min-height: 64px;
+  }
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+  }
+
+  .card-title {
+    font-size: 14px;
+  }
+
+  .card-desc {
+    font-size: 12px;
+  }
+}
+
+/* iPhone Pro Max / Plus (428-430px) */
+@media (min-width: 428px) and (max-width: 430px) {
+  .tool-card {
+    padding: 16px;
+    min-height: 76px;
+  }
+
+  .card-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .card-title {
+    font-size: 16px;
+  }
+
+  .card-desc {
+    font-size: 14px;
+  }
+}
+
+/* 横屏模式 */
+@media (max-width: 844px) and (orientation: landscape) {
+  .tool-card {
+    padding: 10px 12px;
+    min-height: 56px;
+  }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  .card-desc {
+    font-size: 11px;
+  }
+}
 </style>

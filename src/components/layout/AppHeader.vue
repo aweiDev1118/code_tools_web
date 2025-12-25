@@ -378,13 +378,168 @@ const hideResults = () => {
   color: #a5b4fc;
 }
 
-@media (max-width: 768px) {
+/* ========================================
+   iPhone 适配 (iPhone 12-17 全系列)
+   ======================================== */
+
+/* 通用移动端 */
+@media (max-width: 430px) {
+  .header-container {
+    height: calc(56px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .header-content {
+    padding: 0 max(12px, env(safe-area-inset-left)) 0 max(12px, env(safe-area-inset-right));
+    gap: 8px;
+    height: 56px;
+  }
+
+  .header-left {
+    gap: 8px;
+  }
+
   .logo-text {
     display: none;
   }
 
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .menu-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+  }
+
+  .header-center {
+    flex: 1;
+    max-width: none;
+  }
+
+  .search-wrapper {
+    width: 100%;
+  }
+
+  .search-input {
+    height: 44px;
+    padding: 0 12px 0 40px;
+    font-size: 16px; /* 防止 iOS 自动缩放 */
+    border-radius: 10px;
+  }
+
+  .search-icon {
+    left: 12px;
+  }
+
   .search-kbd {
     display: none;
+  }
+
+  .header-right {
+    gap: 4px;
+  }
+
+  .action-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+  }
+
+  .search-results {
+    position: fixed;
+    top: calc(56px + env(safe-area-inset-top) + 8px);
+    left: 12px;
+    right: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
+    border-radius: 14px;
+  }
+
+  .search-result-item {
+    padding: 14px 16px;
+  }
+
+  .result-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .result-name {
+    font-size: 15px;
+  }
+
+  .result-desc {
+    font-size: 13px;
+  }
+
+  .search-empty {
+    padding: 40px 20px;
+  }
+}
+
+/* iPhone mini (375px) */
+@media (max-width: 375px) {
+  .header-content {
+    gap: 6px;
+  }
+
+  .menu-btn,
+  .action-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .search-input {
+    height: 40px;
+    font-size: 15px;
+  }
+}
+
+/* iPhone Pro Max / Plus (428-430px) */
+@media (min-width: 428px) and (max-width: 430px) {
+  .header-content {
+    gap: 12px;
+  }
+
+  .search-input {
+    height: 46px;
+  }
+}
+
+/* 横屏模式 */
+@media (max-width: 844px) and (orientation: landscape) {
+  .header-container {
+    height: calc(48px + env(safe-area-inset-top));
+  }
+
+  .header-content {
+    height: 48px;
+  }
+
+  .menu-btn,
+  .action-btn,
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .search-input {
+    height: 38px;
+  }
+
+  .search-results {
+    top: calc(48px + env(safe-area-inset-top) + 8px);
+    max-height: 50vh;
   }
 }
 </style>

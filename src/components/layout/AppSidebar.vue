@@ -3,8 +3,13 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { categories, getToolsByCategory } from '@/config/tools'
 
-defineProps<{
+const props = defineProps<{
   collapsed: boolean
+  isMobile?: boolean
+}>()
+
+const emit = defineEmits<{
+  close: []
 }>()
 
 const route = useRoute()
@@ -25,6 +30,17 @@ const isCategoryExpanded = (categoryId: string) => {
 
 const goToTool = (toolId: string) => {
   router.push(`/tool/${toolId}`)
+  // 移动端点击后关闭侧边栏
+  if (props.isMobile) {
+    emit('close')
+  }
+}
+
+const goHome = () => {
+  router.push('/')
+  if (props.isMobile) {
+    emit('close')
+  }
 }
 
 const isToolActive = (toolId: string) => {
@@ -38,15 +54,15 @@ const isCategoryActive = (categoryId: string) => {
 </script>
 
 <template>
-  <aside class="sidebar" :class="{ collapsed }">
+  <aside class="sidebar" :class="{ collapsed, 'mobile': isMobile, 'mobile-visible': isMobile && !collapsed }">
     <div class="sidebar-content">
       <!-- Home -->
-      <router-link to="/" class="nav-item" :class="{ active: route.path === '/' }">
+      <div class="nav-item" :class="{ active: route.path === '/' }" @click="goHome">
         <div class="nav-icon">
           <el-icon size="20"><HomeFilled /></el-icon>
         </div>
-        <span v-if="!collapsed" class="nav-text">首页</span>
-      </router-link>
+        <span v-if="!collapsed || isMobile" class="nav-text">首页</span>
+      </div>
 
       <div class="nav-divider"></div>
 
@@ -60,14 +76,14 @@ const isCategoryActive = (categoryId: string) => {
           <div class="nav-icon">
             <el-icon size="18"><component :is="category.icon" /></el-icon>
           </div>
-          <span v-if="!collapsed" class="nav-text">{{ category.name }}</span>
-          <el-icon v-if="!collapsed" class="expand-icon" size="14">
+          <span v-if="!collapsed || isMobile" class="nav-text">{{ category.name }}</span>
+          <el-icon v-if="!collapsed || isMobile" class="expand-icon" size="14">
             <ArrowDown />
           </el-icon>
         </div>
 
         <Transition name="collapse">
-          <div v-if="!collapsed && isCategoryExpanded(category.id)" class="nav-group-items">
+          <div v-if="(!collapsed || isMobile) && isCategoryExpanded(category.id)" class="nav-group-items">
             <div
               v-for="tool in getToolsByCategory(category.id)"
               :key="tool.id"
@@ -84,7 +100,7 @@ const isCategoryActive = (categoryId: string) => {
     </div>
 
     <!-- Footer -->
-    <div v-if="!collapsed" class="sidebar-footer">
+    <div v-if="!collapsed || isMobile" class="sidebar-footer">
       <div class="footer-badge">
         <el-icon size="14"><InfoFilled /></el-icon>
         <span>v0.1.0</span>
@@ -342,5 +358,146 @@ const isCategoryActive = (categoryId: string) => {
   opacity: 1;
   max-height: 500px;
   transform: translateY(0);
+}
+
+/* ========================================
+   iPhone 适配 (iPhone 12-17 全系列)
+   ======================================== */
+
+/* Mobile styles */
+.sidebar.mobile {
+  top: 0;
+  width: 85vw;
+  max-width: 320px;
+  transform: translateX(-100%);
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.98);
+  padding-top: calc(56px + env(safe-area-inset-top));
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+}
+
+.sidebar.mobile.mobile-visible {
+  transform: translateX(0);
+}
+
+.dark .sidebar.mobile {
+  background: rgba(15, 23, 42, 0.98);
+}
+
+@media (max-width: 430px) {
+  .sidebar:not(.mobile) {
+    display: none;
+  }
+
+  .sidebar.mobile .sidebar-content {
+    padding: 12px;
+  }
+
+  .sidebar.mobile .nav-item,
+  .sidebar.mobile .nav-group-header {
+    padding: 12px;
+    margin-bottom: 6px;
+    min-height: 48px;
+  }
+
+  .sidebar.mobile .nav-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .sidebar.mobile .nav-text {
+    font-size: 15px;
+  }
+
+  .sidebar.mobile .nav-sub-item {
+    padding: 12px 12px 12px 24px;
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .sidebar.mobile .nav-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .sidebar.mobile .sidebar-footer {
+    padding: 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .sidebar.mobile .footer-badge {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+/* iPhone mini (375px) */
+@media (max-width: 375px) {
+  .sidebar.mobile {
+    width: 280px;
+  }
+
+  .sidebar.mobile .nav-item,
+  .sidebar.mobile .nav-group-header {
+    padding: 10px;
+    min-height: 44px;
+  }
+
+  .sidebar.mobile .nav-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sidebar.mobile .nav-text {
+    font-size: 14px;
+  }
+}
+
+/* iPhone Pro Max / Plus (428-430px) */
+@media (min-width: 428px) and (max-width: 430px) {
+  .sidebar.mobile {
+    max-width: 340px;
+  }
+
+  .sidebar.mobile .nav-item,
+  .sidebar.mobile .nav-group-header {
+    padding: 14px;
+  }
+
+  .sidebar.mobile .nav-icon {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* 横屏模式 */
+@media (max-width: 844px) and (orientation: landscape) {
+  .sidebar.mobile {
+    padding-top: calc(48px + env(safe-area-inset-top));
+    width: 280px;
+  }
+
+  .sidebar.mobile .nav-item,
+  .sidebar.mobile .nav-group-header {
+    padding: 8px 12px;
+    min-height: 40px;
+  }
+
+  .sidebar.mobile .nav-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar.mobile .nav-text {
+    font-size: 13px;
+  }
+
+  .sidebar.mobile .nav-sub-item {
+    padding: 8px 12px 8px 20px;
+    min-height: 36px;
+    font-size: 13px;
+  }
 }
 </style>
