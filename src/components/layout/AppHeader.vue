@@ -50,7 +50,7 @@ const hideResults = () => {
         </button>
         <router-link to="/" class="logo">
           <div class="logo-icon">
-            <el-icon size="22" color="white"><Box /></el-icon>
+            <img src="@/assets/logo.svg" alt="Logo" class="logo-img" />
           </div>
           <span class="logo-text">DevToolbox</span>
         </router-link>
@@ -186,6 +186,15 @@ const hideResults = () => {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.4);
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
 .logo-text {
