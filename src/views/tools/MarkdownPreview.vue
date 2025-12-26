@@ -2,8 +2,33 @@
 import { ref, computed } from 'vue'
 import { Marked } from 'marked'
 import { markedHighlight } from 'marked-highlight'
-import hljs from 'highlight.js'
+import hljs from 'highlight.js/lib/core'
+// 按需引入常用语言
+import javascript from 'highlight.js/lib/languages/javascript'
+import typescript from 'highlight.js/lib/languages/typescript'
+import xml from 'highlight.js/lib/languages/xml'
+import css from 'highlight.js/lib/languages/css'
+import json from 'highlight.js/lib/languages/json'
+import bash from 'highlight.js/lib/languages/bash'
+import python from 'highlight.js/lib/languages/python'
+import java from 'highlight.js/lib/languages/java'
+import sql from 'highlight.js/lib/languages/sql'
 import 'highlight.js/styles/github.css'
+
+// 注册语言
+hljs.registerLanguage('javascript', javascript)
+hljs.registerLanguage('js', javascript)
+hljs.registerLanguage('typescript', typescript)
+hljs.registerLanguage('ts', typescript)
+hljs.registerLanguage('html', xml)
+hljs.registerLanguage('xml', xml)
+hljs.registerLanguage('css', css)
+hljs.registerLanguage('json', json)
+hljs.registerLanguage('bash', bash)
+hljs.registerLanguage('shell', bash)
+hljs.registerLanguage('python', python)
+hljs.registerLanguage('java', java)
+hljs.registerLanguage('sql', sql)
 import { copyToClipboard } from '@/utils/clipboard'
 
 const marked = new Marked(
