@@ -22,6 +22,7 @@ export const categories: Category[] = [
   { id: 'generator', name: '生成器', icon: 'MagicStick' },
   { id: 'crypto', name: '加密解密', icon: 'Lock' },
   { id: 'color', name: '颜色工具', icon: 'Brush' },
+  { id: 'network', name: '网络工具', icon: 'Connection' },
 ]
 
 export const tools: Tool[] = [
@@ -223,6 +224,48 @@ export const tools: Tool[] = [
     icon: 'Sunny',
     category: 'color',
     keywords: ['渐变', 'gradient', 'css']
+  },
+
+  // 网络工具
+  {
+    id: 'ip-lookup',
+    name: 'IP 地址查询',
+    description: '查询 IP 地址及地理位置信息',
+    icon: 'Position',
+    category: 'network',
+    keywords: ['ip', '地址', '查询', '位置', '网络']
+  },
+  {
+    id: 'browser-info',
+    name: '浏览器信息',
+    description: '获取浏览器和设备详细信息',
+    icon: 'Monitor',
+    category: 'network',
+    keywords: ['浏览器', '设备', '信息', 'browser']
+  },
+  {
+    id: 'url-parser',
+    name: 'URL 解析',
+    description: '解析 URL 地址的各个组成部分',
+    icon: 'Link',
+    category: 'network',
+    keywords: ['url', '解析', '地址', '链接']
+  },
+  {
+    id: 'useragent-parser',
+    name: 'UserAgent 分析',
+    description: '解析 UserAgent 识别浏览器和系统',
+    icon: 'Cpu',
+    category: 'network',
+    keywords: ['useragent', 'ua', '浏览器', '分析']
+  },
+  {
+    id: 'subnet-calculator',
+    name: '子网掩码计算',
+    description: '计算 IP 子网信息和可用主机范围',
+    icon: 'Connection',
+    category: 'network',
+    keywords: ['子网', '掩码', 'cidr', 'ip', '计算']
   },
 ]
 

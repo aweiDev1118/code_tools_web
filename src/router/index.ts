@@ -135,6 +135,32 @@ const routes: RouteRecordRaw[] = [
     name: 'GradientGenerator',
     component: () => import('@/views/tools/GradientGenerator.vue')
   },
+  // 网络工具
+  {
+    path: '/tool/ip-lookup',
+    name: 'IpLookup',
+    component: () => import('@/views/tools/IpLookup.vue')
+  },
+  {
+    path: '/tool/browser-info',
+    name: 'BrowserInfo',
+    component: () => import('@/views/tools/BrowserInfo.vue')
+  },
+  {
+    path: '/tool/url-parser',
+    name: 'UrlParser',
+    component: () => import('@/views/tools/UrlParser.vue')
+  },
+  {
+    path: '/tool/useragent-parser',
+    name: 'UserAgentParser',
+    component: () => import('@/views/tools/UserAgentParser.vue')
+  },
+  {
+    path: '/tool/subnet-calculator',
+    name: 'SubnetCalculator',
+    component: () => import('@/views/tools/SubnetCalculator.vue')
+  },
 ]
 
 const router = createRouter({

@@ -223,9 +223,12 @@ const isCategoryActive = (categoryId: string) => {
   transition: all 0.2s ease;
 }
 
-.nav-item.active .nav-icon,
-.nav-group-header.active .nav-icon {
+.nav-item.active .nav-icon {
   background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-group-header.active .nav-icon {
+  background: rgba(99, 102, 241, 0.15);
 }
 
 .nav-text {
