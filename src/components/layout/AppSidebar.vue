@@ -83,13 +83,13 @@ const isCategoryActive = (categoryId: string) => {
         </div>
 
         <Transition name="collapse">
-          <div v-if="(!collapsed || isMobile) && isCategoryExpanded(category.id)" class="nav-group-items">
+          <div v-if="(!collapsed || isMobile) && isCategoryExpanded(category.id)" class="nav-group-items" @click.stop>
             <div
               v-for="tool in getToolsByCategory(category.id)"
               :key="tool.id"
               class="nav-sub-item"
               :class="{ active: isToolActive(tool.id) }"
-              @click.stop="goToTool(tool.id)"
+              @click="goToTool(tool.id)"
             >
               <span class="nav-dot"></span>
               <span class="nav-text">{{ tool.name }}</span>

@@ -77,6 +77,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/tools/CodeFormatter.vue')
   },
   {
+    path: '/tool/mybatis-generator',
+    name: 'MyBatisGenerator',
+    component: () => import('@/views/tools/MyBatisGenerator.vue')
+  },
+  {
     path: '/tool/regex-tester',
     name: 'RegexTester',
     component: () => import('@/views/tools/RegexTester.vue')

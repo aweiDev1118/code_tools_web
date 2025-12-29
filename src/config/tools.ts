@@ -130,6 +130,14 @@ export const tools: Tool[] = [
     keywords: ['代码', '格式化', 'js', 'css', 'html']
   },
   {
+    id: 'mybatis-generator',
+    name: 'MyBatis 代码生成',
+    description: '根据建表 SQL 生成实体类、Mapper、XML',
+    icon: 'Files',
+    category: 'code',
+    keywords: ['mybatis', '代码生成', 'mapper', 'xml', 'java', 'sql', '建表']
+  },
+  {
     id: 'regex-tester',
     name: '正则测试',
     description: '正则表达式在线测试',
