@@ -171,6 +171,14 @@ export const tools: Tool[] = [
     category: 'datetime',
     keywords: ['日期', '计算', '差值']
   },
+  {
+    id: 'cron-converter',
+    name: 'Cron 表达式',
+    description: 'Cron 表达式生成与反向解析',
+    icon: 'AlarmClock',
+    category: 'datetime',
+    keywords: ['cron', '定时', '表达式', '定时任务', '计划任务']
+  },
 
   // 生成器
   {

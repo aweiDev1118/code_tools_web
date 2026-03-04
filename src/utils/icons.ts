@@ -23,6 +23,7 @@ import {
   Postcard,
   Brush,
   Sunny,
+  Moon,
   Position,
   Monitor,
   Cpu,
@@ -48,6 +49,7 @@ import {
   Picture,
   EditPen,
   Clock,
+  AlarmClock,
 } from '@element-plus/icons-vue'
 
 // 只注册项目中用到的图标
@@ -75,6 +77,7 @@ const icons = {
   Postcard,
   Brush,
   Sunny,
+  Moon,
   Position,
   Monitor,
   Cpu,
@@ -100,6 +103,7 @@ const icons = {
   Picture,
   EditPen,
   Clock,
+  AlarmClock,
 }
 
 export function registerIcons(app: App) {

@@ -102,6 +102,11 @@ const routes: RouteRecordRaw[] = [
     name: 'DateCalculator',
     component: () => import('@/views/tools/DateCalculator.vue')
   },
+  {
+    path: '/tool/cron-converter',
+    name: 'CronConverter',
+    component: () => import('@/views/tools/CronConverter.vue')
+  },
   // 生成器
   {
     path: '/tool/uuid-generator',
