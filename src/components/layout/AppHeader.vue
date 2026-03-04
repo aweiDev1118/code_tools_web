@@ -3,14 +3,41 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { searchTools } from '@/config/tools'
 
-defineProps<{
+type ThemeMode = 'light' | 'dark' | 'system'
+
+const props = defineProps<{
   isDark: boolean
+  themeMode: ThemeMode
 }>()
 
 const emit = defineEmits<{
-  toggleDark: []
+  changeTheme: [mode: ThemeMode]
   toggleSidebar: []
 }>()
+
+const showThemeMenu = ref(false)
+
+const themeOptions: { value: ThemeMode; label: string; icon: string }[] = [
+  { value: 'light', label: '浅色', icon: 'Sunny' },
+  { value: 'dark', label: '深色', icon: 'Moon' },
+  { value: 'system', label: '跟随系统', icon: 'Monitor' },
+]
+
+const currentThemeIcon = () => {
+  if (props.themeMode === 'system') return 'Monitor'
+  return props.isDark ? 'Moon' : 'Sunny'
+}
+
+const selectTheme = (mode: ThemeMode) => {
+  emit('changeTheme', mode)
+  showThemeMenu.value = false
+}
+
+const hideThemeMenu = () => {
+  setTimeout(() => {
+    showThemeMenu.value = false
+  }, 150)
+}
 
 const router = useRouter()
 const searchKeyword = ref('')
@@ -102,11 +129,33 @@ const hideResults = () => {
 
       <!-- Actions -->
       <div class="header-right">
-        <button class="action-btn" @click="emit('toggleDark')">
-          <el-icon size="20">
-            <component :is="isDark ? 'Sunny' : 'Moon'" />
-          </el-icon>
-        </button>
+        <div class="theme-dropdown" tabindex="0" @blur="hideThemeMenu">
+          <button class="action-btn theme-trigger" @click="showThemeMenu = !showThemeMenu">
+            <el-icon size="18">
+              <component :is="currentThemeIcon()" />
+            </el-icon>
+            <el-icon size="12" class="chevron" :class="{ open: showThemeMenu }">
+              <ArrowRight />
+            </el-icon>
+          </button>
+          <transition name="dropdown">
+            <div v-if="showThemeMenu" class="theme-menu">
+              <button
+                v-for="option in themeOptions"
+                :key="option.value"
+                class="theme-option"
+                :class="{ active: themeMode === option.value }"
+                @mousedown.prevent="selectTheme(option.value)"
+              >
+                <el-icon size="16"><component :is="option.icon" /></el-icon>
+                <span>{{ option.label }}</span>
+                <el-icon v-if="themeMode === option.value" size="14" class="check-icon">
+                  <CircleCheck />
+                </el-icon>
+              </button>
+            </div>
+          </transition>
+        </div>
         <a href="https://github.com/aweiDev1118/code_tools_web" target="_blank" class="action-btn">
           <el-icon size="20"><Link /></el-icon>
         </a>
@@ -385,6 +434,107 @@ const hideResults = () => {
 .dark .action-btn:hover {
   border-color: #6366f1;
   color: #a5b4fc;
+}
+
+/* Theme Dropdown */
+.theme-dropdown {
+  position: relative;
+  outline: none;
+}
+
+.theme-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  padding: 0 10px;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+  transform: rotate(90deg);
+}
+
+.chevron.open {
+  transform: rotate(-90deg);
+}
+
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 140px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  padding: 6px;
+  z-index: 200;
+}
+
+.dark .theme-menu {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.4);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.theme-option:hover {
+  background: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+}
+
+.theme-option.active {
+  color: #6366f1;
+  font-weight: 500;
+}
+
+.dark .theme-option {
+  color: #94a3b8;
+}
+
+.dark .theme-option:hover {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+}
+
+.dark .theme-option.active {
+  color: #a5b4fc;
+}
+
+.check-icon {
+  margin-left: auto;
+  color: #6366f1;
+}
+
+.dark .check-icon {
+  color: #a5b4fc;
+}
+
+/* Dropdown Transition */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
 /* ========================================

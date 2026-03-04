@@ -21,6 +21,9 @@ watch(
   }
 )
 
+type ThemeMode = 'light' | 'dark' | 'system'
+
+const themeMode = ref<ThemeMode>((localStorage.getItem('themeMode') as ThemeMode) || 'system')
 const isDark = ref(false)
 const sidebarCollapsed = ref(false)
 const windowWidth = ref(window.innerWidth)
@@ -35,10 +38,27 @@ const sidebarVisible = computed(() => {
   return true
 })
 
-const toggleDark = () => {
-  isDark.value = !isDark.value
-  document.documentElement.classList.toggle('dark', isDark.value)
+const systemDarkQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+const applyTheme = (mode: ThemeMode) => {
+  const shouldBeDark = mode === 'dark' || (mode === 'system' && systemDarkQuery.matches)
+  isDark.value = shouldBeDark
+  document.documentElement.classList.toggle('dark', shouldBeDark)
 }
+
+const changeTheme = (mode: ThemeMode) => {
+  themeMode.value = mode
+  localStorage.setItem('themeMode', mode)
+  applyTheme(mode)
+}
+
+const handleSystemThemeChange = () => {
+  if (themeMode.value === 'system') {
+    applyTheme('system')
+  }
+}
+
+systemDarkQuery.addEventListener('change', handleSystemThemeChange)
 
 const toggleSidebar = () => {
   sidebarCollapsed.value = !sidebarCollapsed.value
@@ -62,6 +82,7 @@ const handleResize = () => {
 
 onMounted(() => {
   window.addEventListener('resize', handleResize)
+  applyTheme(themeMode.value)
   // 初始化时如果是移动端，隐藏侧边栏
   if (isMobile.value) {
     sidebarCollapsed.value = true
@@ -70,10 +91,12 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  systemDarkQuery.removeEventListener('change', handleSystemThemeChange)
 })
 
 provide('isDark', isDark)
-provide('toggleDark', toggleDark)
+provide('themeMode', themeMode)
+provide('changeTheme', changeTheme)
 provide('isMobile', isMobile)
 provide('closeSidebar', closeSidebar)
 </script>
@@ -82,7 +105,8 @@ provide('closeSidebar', closeSidebar)
   <div class="app-container" :class="{ dark: isDark, mobile: isMobile }">
     <AppHeader
       :is-dark="isDark"
-      @toggle-dark="toggleDark"
+      :theme-mode="themeMode"
+      @change-theme="changeTheme"
       @toggle-sidebar="toggleSidebar"
     />
 
