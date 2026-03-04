@@ -1,7 +1,25 @@
 <script setup lang="ts">
-import { ref, provide, computed, onMounted, onUnmounted } from 'vue'
+import { ref, provide, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppSidebar from './components/layout/AppSidebar.vue'
+import { useHistory } from '@/composables/useHistory'
+import { useSeo } from '@/composables/useSeo'
+
+useSeo()
+
+const { addHistory } = useHistory()
+const route = useRoute()
+
+watch(
+  () => route.path,
+  (path) => {
+    if (path.startsWith('/tool/')) {
+      const toolId = path.replace('/tool/', '')
+      addHistory(toolId)
+    }
+  }
+)
 
 const isDark = ref(false)
 const sidebarCollapsed = ref(false)

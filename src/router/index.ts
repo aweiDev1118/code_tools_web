@@ -12,6 +12,17 @@ const routes: RouteRecordRaw[] = [
     name: 'Category',
     component: () => import('@/views/CategoryView.vue')
   },
+  // 功能页面
+  {
+    path: '/favorites',
+    name: 'Favorites',
+    component: () => import('@/views/FavoritesView.vue')
+  },
+  {
+    path: '/history',
+    name: 'History',
+    component: () => import('@/views/HistoryView.vue')
+  },
   // 文本工具
   {
     path: '/tool/json-formatter',
@@ -170,6 +181,59 @@ const routes: RouteRecordRaw[] = [
     path: '/tool/subnet-calculator',
     name: 'SubnetCalculator',
     component: () => import('@/views/tools/SubnetCalculator.vue')
+  },
+  // 计算工具
+  {
+    path: '/tool/unit-converter',
+    name: 'UnitConverter',
+    component: () => import('@/views/tools/UnitConverter.vue')
+  },
+  {
+    path: '/tool/file-size-converter',
+    name: 'FileSizeConverter',
+    component: () => import('@/views/tools/FileSizeConverter.vue')
+  },
+  // 开发辅助
+  {
+    path: '/tool/http-status-codes',
+    name: 'HttpStatusCodes',
+    component: () => import('@/views/tools/HttpStatusCodes.vue')
+  },
+  {
+    path: '/tool/ascii-table',
+    name: 'AsciiTable',
+    component: () => import('@/views/tools/AsciiTable.vue')
+  },
+  {
+    path: '/tool/mime-types',
+    name: 'MimeTypes',
+    component: () => import('@/views/tools/MimeTypes.vue')
+  },
+  // 新增文本/代码/颜色/日期/生成器
+  {
+    path: '/tool/text-dedup',
+    name: 'TextDedup',
+    component: () => import('@/views/tools/TextDedup.vue')
+  },
+  {
+    path: '/tool/json-to-ts',
+    name: 'JsonToTs',
+    component: () => import('@/views/tools/JsonToTs.vue')
+  },
+  {
+    path: '/tool/contrast-checker',
+    name: 'ContrastChecker',
+    component: () => import('@/views/tools/ContrastChecker.vue')
+  },
+  {
+    path: '/tool/timezone-converter',
+    name: 'TimezoneConverter',
+    component: () => import('@/views/tools/TimezoneConverter.vue')
+  },
+  {
+    path: '/tool/lorem-ipsum',
+    name: 'LoremIpsum',
+    component: () => import('@/views/tools/LoremIpsum.vue')
   },
 ]
 

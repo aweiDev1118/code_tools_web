@@ -43,6 +43,13 @@ const goHome = () => {
   }
 }
 
+const goTo = (path: string) => {
+  router.push(path)
+  if (props.isMobile) {
+    emit('close')
+  }
+}
+
 const isToolActive = (toolId: string) => {
   return route.path === `/tool/${toolId}`
 }
@@ -62,6 +69,19 @@ const isCategoryActive = (categoryId: string) => {
           <el-icon size="20"><HomeFilled /></el-icon>
         </div>
         <span v-if="!collapsed || isMobile" class="nav-text">首页</span>
+      </div>
+
+      <div class="nav-item" :class="{ active: route.path === '/favorites' }" @click="goTo('/favorites')">
+        <div class="nav-icon">
+          <el-icon size="20"><StarFilled /></el-icon>
+        </div>
+        <span v-if="!collapsed || isMobile" class="nav-text">我的收藏</span>
+      </div>
+      <div class="nav-item" :class="{ active: route.path === '/history' }" @click="goTo('/history')">
+        <div class="nav-icon">
+          <el-icon size="20"><Clock /></el-icon>
+        </div>
+        <span v-if="!collapsed || isMobile" class="nav-text">使用历史</span>
       </div>
 
       <div class="nav-divider"></div>

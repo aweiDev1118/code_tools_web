@@ -23,6 +23,8 @@ export const categories: Category[] = [
   { id: 'crypto', name: '加密解密', icon: 'Lock' },
   { id: 'color', name: '颜色工具', icon: 'Brush' },
   { id: 'network', name: '网络工具', icon: 'Connection' },
+  { id: 'calculator', name: '计算工具', icon: 'Odometer' },
+  { id: 'dev', name: '开发辅助', icon: 'SetUp' },
 ]
 
 export const tools: Tool[] = [
@@ -58,6 +60,14 @@ export const tools: Tool[] = [
     icon: 'Sort',
     category: 'text',
     keywords: ['大小写', '转换', 'camel', 'snake']
+  },
+  {
+    id: 'text-dedup',
+    name: '文本去重',
+    description: '按行去重，支持多种去重规则',
+    icon: 'Minus',
+    category: 'text',
+    keywords: ['去重', '去重复', '文本', 'dedup']
   },
 
   // 编码转换
@@ -130,6 +140,14 @@ export const tools: Tool[] = [
     keywords: ['代码', '格式化', 'js', 'css', 'html']
   },
   {
+    id: 'json-to-ts',
+    name: 'JSON 转 TS',
+    description: 'JSON 生成 TypeScript 类型定义',
+    icon: 'SetUp',
+    category: 'code',
+    keywords: ['json', 'typescript', 'ts', '类型', '接口', 'interface']
+  },
+  {
     id: 'mybatis-generator',
     name: 'MyBatis 代码生成',
     description: '根据建表 SQL 生成实体类、Mapper、XML',
@@ -179,6 +197,14 @@ export const tools: Tool[] = [
     category: 'datetime',
     keywords: ['cron', '定时', '表达式', '定时任务', '计划任务']
   },
+  {
+    id: 'timezone-converter',
+    name: '时区转换',
+    description: '不同时区时间互转',
+    icon: 'Clock',
+    category: 'datetime',
+    keywords: ['时区', '时间', '转换', 'timezone', 'UTC']
+  },
 
   // 生成器
   {
@@ -204,6 +230,14 @@ export const tools: Tool[] = [
     icon: 'Operation',
     category: 'generator',
     keywords: ['进制', '转换', '二进制', '十六进制']
+  },
+  {
+    id: 'lorem-ipsum',
+    name: 'Lorem Ipsum',
+    description: '占位文本生成，支持中英文',
+    icon: 'Reading',
+    category: 'generator',
+    keywords: ['lorem', 'ipsum', '占位', '文本', '生成']
   },
 
   // 加密解密
@@ -240,6 +274,14 @@ export const tools: Tool[] = [
     icon: 'Sunny',
     category: 'color',
     keywords: ['渐变', 'gradient', 'css']
+  },
+  {
+    id: 'contrast-checker',
+    name: '对比度检测',
+    description: 'WCAG 文字背景对比度检测',
+    icon: 'View',
+    category: 'color',
+    keywords: ['对比度', 'WCAG', '颜色', '无障碍', 'contrast']
   },
 
   // 网络工具
@@ -282,6 +324,50 @@ export const tools: Tool[] = [
     icon: 'Connection',
     category: 'network',
     keywords: ['子网', '掩码', 'cidr', 'ip', '计算']
+  },
+
+  // 计算工具
+  {
+    id: 'unit-converter',
+    name: '单位换算',
+    description: '长度/重量/温度/面积/体积换算',
+    icon: 'Odometer',
+    category: 'calculator',
+    keywords: ['单位', '换算', '长度', '重量', '温度', '面积']
+  },
+  {
+    id: 'file-size-converter',
+    name: '文件大小换算',
+    description: 'KB/MB/GB/TB 文件大小换算',
+    icon: 'Coin',
+    category: 'calculator',
+    keywords: ['文件', '大小', 'KB', 'MB', 'GB', '换算']
+  },
+
+  // 开发辅助
+  {
+    id: 'http-status-codes',
+    name: 'HTTP 状态码',
+    description: 'HTTP 状态码速查表',
+    icon: 'ChatDotRound',
+    category: 'dev',
+    keywords: ['http', '状态码', 'status', '200', '404', '500']
+  },
+  {
+    id: 'ascii-table',
+    name: 'ASCII 码表',
+    description: 'ASCII 字符对照表',
+    icon: 'Menu',
+    category: 'dev',
+    keywords: ['ascii', '码表', '字符', '编码']
+  },
+  {
+    id: 'mime-types',
+    name: 'MIME 类型',
+    description: 'MIME 类型速查表',
+    icon: 'Stamp',
+    category: 'dev',
+    keywords: ['mime', '类型', '文件', 'content-type']
   },
 ]
 

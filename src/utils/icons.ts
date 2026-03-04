@@ -50,6 +50,18 @@ import {
   EditPen,
   Clock,
   AlarmClock,
+  Star,
+  StarFilled,
+  Minus,
+  Reading,
+  Odometer,
+  Coin,
+  ChatDotRound,
+  Menu,
+  Stamp,
+  View,
+  SetUp,
+  Files,
 } from '@element-plus/icons-vue'
 
 // 只注册项目中用到的图标
@@ -104,6 +116,18 @@ const icons = {
   EditPen,
   Clock,
   AlarmClock,
+  Star,
+  StarFilled,
+  Minus,
+  Reading,
+  Odometer,
+  Coin,
+  ChatDotRound,
+  Menu,
+  Stamp,
+  View,
+  SetUp,
+  Files,
 }
 
 export function registerIcons(app: App) {

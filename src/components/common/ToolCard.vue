@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import type { Tool } from '@/config/tools'
+import { useFavorites } from '@/composables/useFavorites'
 
 defineProps<{
   tool: Tool
 }>()
+
+const { isFavorite, toggleFavorite } = useFavorites()
 </script>
 
 <template>
@@ -17,6 +20,16 @@ defineProps<{
         <div class="card-info">
           <h3 class="card-title">{{ tool.name }}</h3>
           <p class="card-desc">{{ tool.description }}</p>
+        </div>
+        <div
+          class="card-favorite"
+          :class="{ 'is-favorite': isFavorite(tool.id) }"
+          @click.prevent.stop="toggleFavorite(tool.id)"
+        >
+          <el-icon size="16">
+            <StarFilled v-if="isFavorite(tool.id)" />
+            <Star v-else />
+          </el-icon>
         </div>
         <div class="card-arrow">
           <el-icon><ArrowRight /></el-icon>
@@ -189,6 +202,41 @@ defineProps<{
   color: #a5b4fc;
 }
 
+.card-favorite {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d4d4d8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.card-favorite:hover {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.card-favorite.is-favorite {
+  color: #fbbf24;
+}
+
+.dark .card-favorite {
+  color: #52525b;
+}
+
+.dark .card-favorite:hover {
+  color: #fbbf24;
+}
+
+.dark .card-favorite.is-favorite {
+  color: #fbbf24;
+}
+
 /* ========================================
    iPhone 适配 (iPhone 12-17 全系列)
    ======================================== */
@@ -236,6 +284,11 @@ defineProps<{
 
   .card-glow {
     display: none;
+  }
+
+  .card-favorite {
+    width: 28px;
+    height: 28px;
   }
 }
 
