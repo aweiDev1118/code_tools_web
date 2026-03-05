@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 type SizeUnit = 'B' | 'KB' | 'MB' | 'GB' | 'TB' | 'PB'
 
@@ -29,7 +32,6 @@ const formatValue = (bytes: number, unit: SizeUnit, b: number): string => {
   if (!isFinite(v)) return '—'
   if (v === 0) return '0'
   if (v >= 1e15) return v.toExponential(4)
-  // Show reasonable decimal places
   if (v >= 1000) return parseFloat(v.toFixed(4)).toString()
   if (v >= 1) return parseFloat(v.toFixed(6)).toString()
   return parseFloat(v.toPrecision(6)).toString()
@@ -47,7 +49,7 @@ const results = computed((): ResultRow[] => {
 })
 
 const handleCopy = (row: ResultRow) => {
-  copyToClipboard(row.value, `已复制 ${row.value} ${row.unit}`)
+  copyToClipboard(row.value, t('tool.file-size-converter.copied', { value: row.value, unit: row.unit }))
 }
 
 const isCurrentUnit = (unit: SizeUnit): boolean => unit === fromUnit.value
@@ -56,8 +58,8 @@ const isCurrentUnit = (unit: SizeUnit): boolean => unit === fromUnit.value
 <template>
   <div class="max-w-5xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">文件大小换算</h1>
-      <p class="text-gray-500">B、KB、MB、GB、TB、PB 互相换算，支持二进制(1024)和十进制(1000)两种模式</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.file-size-converter.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.file-size-converter.subtitle') }}</p>
     </div>
 
     <el-card>
@@ -67,7 +69,7 @@ const isCurrentUnit = (unit: SizeUnit): boolean => unit === fromUnit.value
           :min="0"
           :controls="true"
           :precision="6"
-          placeholder="输入文件大小"
+          :placeholder="t('tool.file-size-converter.inputPlaceholder')"
           style="width: 200px"
         />
         <el-select v-model="fromUnit" style="width: 100px">
@@ -80,22 +82,22 @@ const isCurrentUnit = (unit: SizeUnit): boolean => unit === fromUnit.value
         </el-select>
 
         <div class="flex items-center gap-2 ml-auto">
-          <span class="text-sm text-gray-500">十进制(1000)</span>
+          <span class="text-sm text-gray-500">{{ t('tool.file-size-converter.decimal1000') }}</span>
           <el-switch v-model="binaryMode" />
-          <span class="text-sm text-gray-500">二进制(1024)</span>
+          <span class="text-sm text-gray-500">{{ t('tool.file-size-converter.binary1024') }}</span>
         </div>
       </div>
 
       <el-alert
         class="mb-4"
-        :title="binaryMode ? '二进制模式：1 KB = 1024 B，1 MB = 1024 KB（符合操作系统实际显示）' : '十进制模式：1 KB = 1000 B，1 MB = 1000 KB（符合硬盘厂商标注）'"
+        :title="binaryMode ? t('tool.file-size-converter.binaryModeNote') : t('tool.file-size-converter.decimalModeNote')"
         type="info"
         :closable="false"
         show-icon
       />
 
       <el-table :data="results" stripe border>
-        <el-table-column label="单位" width="100">
+        <el-table-column :label="t('tool.file-size-converter.unitCol')" width="100">
           <template #default="{ row }">
             <span
               class="font-semibold"
@@ -103,22 +105,22 @@ const isCurrentUnit = (unit: SizeUnit): boolean => unit === fromUnit.value
             >
               {{ row.unit }}
             </span>
-            <el-tag v-if="isCurrentUnit(row.unit)" size="small" class="ml-2">输入</el-tag>
+            <el-tag v-if="isCurrentUnit(row.unit)" size="small" class="ml-2">{{ t('common.input') }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="换算结果">
+        <el-table-column :label="t('tool.file-size-converter.resultCol')">
           <template #default="{ row }">
             <span class="font-mono text-base">{{ row.value }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="进制说明" width="200">
+        <el-table-column :label="t('tool.file-size-converter.baseNote')" width="200">
           <template #default="{ row }">
             <span class="text-gray-400 text-sm">
               {{ binaryMode ? '1 ' + row.unit + ' = ' + Math.pow(1024, units.indexOf(row.unit)) + ' B' : '1 ' + row.unit + ' = ' + Math.pow(1000, units.indexOf(row.unit)) + ' B' }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="80" align="center">
+        <el-table-column :label="t('tool.file-size-converter.actionCol')" width="80" align="center">
           <template #default="{ row }">
             <el-button
               link
@@ -126,7 +128,7 @@ const isCurrentUnit = (unit: SizeUnit): boolean => unit === fromUnit.value
               size="small"
               @click="handleCopy(row)"
             >
-              复制
+              {{ t('common.copy') }}
             </el-button>
           </template>
         </el-table-column>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const input = ref('')
 const rootName = ref('RootType')
@@ -61,7 +64,7 @@ const result = computed(() => {
 
     return parts.join('\n\n')
   } catch {
-    return '// JSON 解析错误，请检查输入格式'
+    return t('tool.json-to-ts.parseError')
   }
 })
 
@@ -106,25 +109,25 @@ const copyResult = () => {
 <template>
   <div class="max-w-6xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">JSON 转 TypeScript</h1>
-      <p class="text-gray-500">将 JSON 数据转换为 TypeScript 接口/类型定义</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.json-to-ts.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.json-to-ts.subtitle') }}</p>
     </div>
 
     <el-card class="mb-4">
       <div class="flex flex-wrap items-center gap-4">
         <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600 dark:text-gray-300">类型名称：</span>
+          <span class="text-sm text-gray-600 dark:text-gray-300">{{ t('tool.json-to-ts.typeName') }}：</span>
           <el-input v-model="rootName" placeholder="RootType" style="width: 160px" />
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600 dark:text-gray-300">风格：</span>
+          <span class="text-sm text-gray-600 dark:text-gray-300">{{ t('tool.json-to-ts.style') }}：</span>
           <el-radio-group v-model="useInterface">
             <el-radio-button :value="true">interface</el-radio-button>
             <el-radio-button :value="false">type</el-radio-button>
           </el-radio-group>
         </div>
-        <el-button @click="loadSample" text>加载示例</el-button>
-        <el-button @click="clear">清空</el-button>
+        <el-button @click="loadSample" text>{{ t('common.loadSample') }}</el-button>
+        <el-button @click="clear">{{ t('common.clear') }}</el-button>
       </div>
     </el-card>
 
@@ -132,7 +135,7 @@ const copyResult = () => {
       <el-card>
         <template #header>
           <div class="flex items-center justify-between">
-            <span>JSON 输入</span>
+            <span>{{ t('tool.json-to-ts.jsonInput') }}</span>
             <span v-if="error" class="text-xs text-red-500">{{ error }}</span>
           </div>
         </template>
@@ -140,7 +143,7 @@ const copyResult = () => {
           v-model="input"
           type="textarea"
           :rows="20"
-          placeholder='请输入 JSON 数据，例如：&#10;{&#10;  "name": "test",&#10;  "value": 123&#10;}'
+          :placeholder="t('tool.json-to-ts.inputPlaceholder')"
           class="font-mono"
         />
       </el-card>
@@ -148,14 +151,14 @@ const copyResult = () => {
       <el-card>
         <template #header>
           <div class="flex items-center justify-between">
-            <span>TypeScript 输出</span>
-            <el-button size="small" :disabled="!result || !!error" @click="copyResult">复制</el-button>
+            <span>{{ t('tool.json-to-ts.tsOutput') }}</span>
+            <el-button size="small" :disabled="!result || !!error" @click="copyResult">{{ t('common.copy') }}</el-button>
           </div>
         </template>
         <pre
           class="p-3 bg-gray-50 dark:bg-gray-700 rounded font-mono text-sm overflow-auto whitespace-pre-wrap"
           style="min-height: 432px; max-height: 432px;"
-        >{{ result || '// TypeScript 类型将显示在此处' }}</pre>
+        >{{ result || t('tool.json-to-ts.outputPlaceholder') }}</pre>
       </el-card>
     </div>
   </div>

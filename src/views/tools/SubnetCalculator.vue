@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const ipAddress = ref('192.168.1.100')
 const cidr = ref(24)
@@ -54,22 +57,19 @@ const getIpClass = (ip: string): string => {
   if (firstOctet >= 1 && firstOctet <= 126) return 'A'
   if (firstOctet >= 128 && firstOctet <= 191) return 'B'
   if (firstOctet >= 192 && firstOctet <= 223) return 'C'
-  if (firstOctet >= 224 && firstOctet <= 239) return 'D (多播)'
-  if (firstOctet >= 240 && firstOctet <= 255) return 'E (保留)'
-  return '特殊'
+  if (firstOctet >= 224 && firstOctet <= 239) return `D (${t('tool.subnet-calculator.multicast')})`
+  if (firstOctet >= 240 && firstOctet <= 255) return `E (${t('tool.subnet-calculator.reserved')})`
+  return t('tool.subnet-calculator.special')
 }
 
 const getIpType = (ip: string): string => {
   const parts = ip.split('.').map(Number)
-  // 私有地址范围
-  if (parts[0] === 10) return '私有地址 (A类)'
-  if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return '私有地址 (B类)'
-  if (parts[0] === 192 && parts[1] === 168) return '私有地址 (C类)'
-  // 回环地址
-  if (parts[0] === 127) return '回环地址'
-  // 链路本地
-  if (parts[0] === 169 && parts[1] === 254) return '链路本地地址'
-  return '公网地址'
+  if (parts[0] === 10) return t('tool.subnet-calculator.privateA')
+  if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return t('tool.subnet-calculator.privateB')
+  if (parts[0] === 192 && parts[1] === 168) return t('tool.subnet-calculator.privateC')
+  if (parts[0] === 127) return t('tool.subnet-calculator.loopback')
+  if (parts[0] === 169 && parts[1] === 254) return t('tool.subnet-calculator.linkLocal')
+  return t('tool.subnet-calculator.public')
 }
 
 const subnetInfo = computed<SubnetInfo | null>(() => {
@@ -107,13 +107,13 @@ const isValid = computed(() => isValidIp(ipAddress.value))
 
 const copyAllInfo = () => {
   if (!subnetInfo.value) return
-  const info = `IP 地址: ${ipAddress.value}/${cidr.value}
-子网掩码: ${subnetInfo.value.subnetMask}
-网络地址: ${subnetInfo.value.networkAddress}
-广播地址: ${subnetInfo.value.broadcastAddress}
-可用主机范围: ${subnetInfo.value.firstHost} - ${subnetInfo.value.lastHost}
-可用主机数: ${subnetInfo.value.usableHosts}
-IP 类型: ${subnetInfo.value.ipType}`
+  const info = `${t('tool.subnet-calculator.ipAddressLabel')}: ${ipAddress.value}/${cidr.value}
+${t('tool.subnet-calculator.subnetMask')}: ${subnetInfo.value.subnetMask}
+${t('tool.subnet-calculator.networkAddress')}: ${subnetInfo.value.networkAddress}
+${t('tool.subnet-calculator.broadcastAddress')}: ${subnetInfo.value.broadcastAddress}
+${t('tool.subnet-calculator.usableHostRange')}: ${subnetInfo.value.firstHost} - ${subnetInfo.value.lastHost}
+${t('tool.subnet-calculator.usableHosts')}: ${subnetInfo.value.usableHosts}
+${t('tool.subnet-calculator.ipTypeLabel')}: ${subnetInfo.value.ipType}`
   copyToClipboard(info)
 }
 
@@ -123,13 +123,13 @@ const commonCidrs = [8, 16, 24, 25, 26, 27, 28, 29, 30, 31, 32]
 <template>
   <div class="max-w-4xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">子网掩码计算器</h1>
-      <p class="text-gray-500">计算 IP 地址的子网信息、可用主机范围等</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.subnet-calculator.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.subnet-calculator.subtitle') }}</p>
     </div>
 
     <!-- 输入区 -->
     <el-card class="mb-4">
-      <template #header>输入 IP 地址</template>
+      <template #header>{{ t('tool.subnet-calculator.inputIp') }}</template>
       <div class="input-row">
         <el-input
           v-model="ipAddress"
@@ -151,10 +151,10 @@ const commonCidrs = [8, 16, 24, 25, 26, 27, 28, 29, 30, 31, 32]
         />
       </div>
       <div v-if="ipAddress && !isValid" class="mt-2 text-red-500 text-sm">
-        IP 地址格式不正确
+        {{ t('tool.subnet-calculator.invalidIp') }}
       </div>
       <div class="mt-3 flex flex-wrap gap-2">
-        <span class="text-sm text-gray-500 mr-2">常用 CIDR:</span>
+        <span class="text-sm text-gray-500 mr-2">{{ t('tool.subnet-calculator.commonCidr') }}:</span>
         <el-tag
           v-for="c in commonCidrs"
           :key="c"
@@ -168,7 +168,7 @@ const commonCidrs = [8, 16, 24, 25, 26, 27, 28, 29, 30, 31, 32]
       <div class="mt-3">
         <el-button type="primary" @click="copyAllInfo" :disabled="!subnetInfo">
           <el-icon class="mr-1"><CopyDocument /></el-icon>
-          复制全部信息
+          {{ t('tool.subnet-calculator.copyAllInfo') }}
         </el-button>
       </div>
     </el-card>
@@ -180,7 +180,7 @@ const commonCidrs = [8, 16, 24, 25, 26, 27, 28, 29, 30, 31, 32]
         <div class="main-info">
           <div class="main-ip">{{ ipAddress }}/{{ cidr }}</div>
           <div class="main-desc">
-            <el-tag>{{ subnetInfo.ipClass }} 类</el-tag>
+            <el-tag>{{ subnetInfo.ipClass }} {{ t('tool.subnet-calculator.class') }}</el-tag>
             <el-tag type="info">{{ subnetInfo.ipType }}</el-tag>
           </div>
         </div>
@@ -192,24 +192,24 @@ const commonCidrs = [8, 16, 24, 25, 26, 27, 28, 29, 30, 31, 32]
           <template #header>
             <div class="card-header">
               <el-icon><Connection /></el-icon>
-              <span>地址信息</span>
+              <span>{{ t('tool.subnet-calculator.addressInfo') }}</span>
             </div>
           </template>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">网络地址</span>
+              <span class="info-label">{{ t('tool.subnet-calculator.networkAddress') }}</span>
               <span class="info-value">{{ subnetInfo.networkAddress }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">广播地址</span>
+              <span class="info-label">{{ t('tool.subnet-calculator.broadcastAddress') }}</span>
               <span class="info-value">{{ subnetInfo.broadcastAddress }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">子网掩码</span>
+              <span class="info-label">{{ t('tool.subnet-calculator.subnetMask') }}</span>
               <span class="info-value">{{ subnetInfo.subnetMask }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">通配符掩码</span>
+              <span class="info-label">{{ t('tool.subnet-calculator.wildcardMask') }}</span>
               <span class="info-value">{{ subnetInfo.wildcardMask }}</span>
             </div>
           </div>
@@ -220,24 +220,24 @@ const commonCidrs = [8, 16, 24, 25, 26, 27, 28, 29, 30, 31, 32]
           <template #header>
             <div class="card-header">
               <el-icon><Monitor /></el-icon>
-              <span>主机信息</span>
+              <span>{{ t('tool.subnet-calculator.hostInfo') }}</span>
             </div>
           </template>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">第一个可用主机</span>
+              <span class="info-label">{{ t('tool.subnet-calculator.firstHost') }}</span>
               <span class="info-value">{{ subnetInfo.firstHost }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">最后一个可用主机</span>
+              <span class="info-label">{{ t('tool.subnet-calculator.lastHost') }}</span>
               <span class="info-value">{{ subnetInfo.lastHost }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">总地址数</span>
+              <span class="info-label">{{ t('tool.subnet-calculator.totalAddresses') }}</span>
               <span class="info-value">{{ subnetInfo.totalHosts.toLocaleString() }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">可用主机数</span>
+              <span class="info-label">{{ t('tool.subnet-calculator.usableHosts') }}</span>
               <span class="info-value highlight">{{ subnetInfo.usableHosts.toLocaleString() }}</span>
             </div>
           </div>
@@ -248,16 +248,16 @@ const commonCidrs = [8, 16, 24, 25, 26, 27, 28, 29, 30, 31, 32]
           <template #header>
             <div class="card-header">
               <el-icon><Tickets /></el-icon>
-              <span>二进制表示</span>
+              <span>{{ t('tool.subnet-calculator.binaryRepresentation') }}</span>
             </div>
           </template>
           <div class="binary-grid">
             <div class="binary-item">
-              <span class="binary-label">IP 地址</span>
+              <span class="binary-label">{{ t('tool.subnet-calculator.ipAddressLabel') }}</span>
               <code class="binary-value">{{ subnetInfo.binaryIp }}</code>
             </div>
             <div class="binary-item">
-              <span class="binary-label">子网掩码</span>
+              <span class="binary-label">{{ t('tool.subnet-calculator.subnetMask') }}</span>
               <code class="binary-value">{{ subnetInfo.binaryMask }}</code>
             </div>
           </div>

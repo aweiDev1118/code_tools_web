@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { copyToClipboard } from '@/utils/clipboard'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const mode = ref<'toBase64' | 'toImage'>('toBase64')
 const base64Output = ref('')
@@ -76,23 +79,23 @@ const formatSize = (bytes: number) => {
 <template>
   <div class="max-w-5xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">图片 Base64 转换</h1>
-      <p class="text-gray-500">图片与 Base64 编码互相转换</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.image-base64.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.image-base64.subtitle') }}</p>
     </div>
 
     <div class="mb-4 flex flex-wrap gap-2 items-center">
       <el-radio-group v-model="mode">
-        <el-radio-button value="toBase64">图片 → Base64</el-radio-button>
-        <el-radio-button value="toImage">Base64 → 图片</el-radio-button>
+        <el-radio-button value="toBase64">{{ t('tool.image-base64.imageToBase64') }}</el-radio-button>
+        <el-radio-button value="toImage">{{ t('tool.image-base64.base64ToImage') }}</el-radio-button>
       </el-radio-group>
-      <el-button @click="copy">复制</el-button>
-      <el-button @click="clear">清空</el-button>
+      <el-button @click="copy">{{ t('common.copy') }}</el-button>
+      <el-button @click="clear">{{ t('common.clear') }}</el-button>
     </div>
 
     <!-- 图片转 Base64 -->
     <div v-if="mode === 'toBase64'" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <el-card>
-        <template #header>选择图片</template>
+        <template #header>{{ t('tool.image-base64.selectImage') }}</template>
         <el-upload
           drag
           :auto-upload="false"
@@ -101,27 +104,27 @@ const formatSize = (bytes: number) => {
           :on-change="(file: any) => handleFileChange(file.raw)"
         >
           <el-icon size="48" class="text-gray-400"><Upload /></el-icon>
-          <div class="text-gray-500 mt-2">拖拽图片到此处或点击选择</div>
+          <div class="text-gray-500 mt-2">{{ t('tool.image-base64.uploadHint') }}</div>
         </el-upload>
         <div v-if="fileName" class="mt-4 text-sm text-gray-500">
-          <p>文件名: {{ fileName }}</p>
-          <p>大小: {{ formatSize(fileSize) }}</p>
-          <p>类型: {{ fileType }}</p>
+          <p>{{ t('tool.image-base64.fileName') }}: {{ fileName }}</p>
+          <p>{{ t('tool.image-base64.fileSize') }}: {{ formatSize(fileSize) }}</p>
+          <p>{{ t('tool.image-base64.fileType') }}: {{ fileType }}</p>
         </div>
       </el-card>
 
       <el-card>
-        <template #header>Base64 编码</template>
+        <template #header>{{ t('tool.image-base64.base64Code') }}</template>
         <el-input
           v-model="base64Output"
           type="textarea"
           :rows="12"
           readonly
-          placeholder="Base64 编码将显示在这里..."
+          :placeholder="t('tool.image-base64.base64Placeholder')"
           class="font-mono text-xs"
         />
         <div v-if="base64Output" class="mt-2 text-sm text-gray-500">
-          长度: {{ base64Output.length }} 字符
+          {{ t('tool.image-base64.length') }}: {{ base64Output.length }} {{ t('tool.image-base64.chars') }}
         </div>
       </el-card>
     </div>
@@ -129,12 +132,12 @@ const formatSize = (bytes: number) => {
     <!-- Base64 转图片 -->
     <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <el-card>
-        <template #header>Base64 编码</template>
+        <template #header>{{ t('tool.image-base64.base64Code') }}</template>
         <el-input
           v-model="base64Input"
           type="textarea"
           :rows="12"
-          placeholder="请输入 Base64 编码..."
+          :placeholder="t('tool.image-base64.inputBase64Placeholder')"
           class="font-mono text-xs"
           @input="handleBase64Input"
         />
@@ -143,8 +146,8 @@ const formatSize = (bytes: number) => {
       <el-card>
         <template #header>
           <div class="flex justify-between items-center">
-            <span>图片预览</span>
-            <el-button v-if="imagePreview" size="small" @click="download">下载</el-button>
+            <span>{{ t('tool.image-base64.imagePreview') }}</span>
+            <el-button v-if="imagePreview" size="small" @click="download">{{ t('common.download') }}</el-button>
           </div>
         </template>
         <div class="min-h-[200px] flex items-center justify-center bg-gray-50 dark:bg-gray-700 rounded">
@@ -154,7 +157,7 @@ const formatSize = (bytes: number) => {
             alt="Preview"
             class="max-w-full max-h-[300px]"
           />
-          <span v-else class="text-gray-400">图片预览</span>
+          <span v-else class="text-gray-400">{{ t('tool.image-base64.imagePreview') }}</span>
         </div>
       </el-card>
     </div>

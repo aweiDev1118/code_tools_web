@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 type CategoryKey = 'length' | 'weight' | 'temperature' | 'area' | 'volume'
 
 interface UnitDef {
-  label: string
+  labelKey: string
   symbol: string
   toBase: number
 }
@@ -20,83 +23,86 @@ const activeCategory = ref<CategoryKey>('length')
 const inputValue = ref<number | undefined>(undefined)
 const fromUnit = ref<string>('')
 
-// Conversion factors relative to base unit
-const categories: Record<CategoryKey, { label: string; base: string; units: UnitDef[] }> = {
+const categoriesConfig: Record<CategoryKey, { labelKey: string; base: string; units: UnitDef[] }> = {
   length: {
-    label: '长度',
+    labelKey: 'tool.unit-converter.length',
     base: 'm',
     units: [
-      { label: '毫米', symbol: 'mm', toBase: 0.001 },
-      { label: '厘米', symbol: 'cm', toBase: 0.01 },
-      { label: '米', symbol: 'm', toBase: 1 },
-      { label: '千米', symbol: 'km', toBase: 1000 },
-      { label: '英寸', symbol: 'in', toBase: 0.0254 },
-      { label: '英尺', symbol: 'ft', toBase: 0.3048 },
-      { label: '码', symbol: 'yd', toBase: 0.9144 },
-      { label: '英里', symbol: 'mi', toBase: 1609.344 },
+      { labelKey: 'tool.unit-converter.mm', symbol: 'mm', toBase: 0.001 },
+      { labelKey: 'tool.unit-converter.cm', symbol: 'cm', toBase: 0.01 },
+      { labelKey: 'tool.unit-converter.m', symbol: 'm', toBase: 1 },
+      { labelKey: 'tool.unit-converter.km', symbol: 'km', toBase: 1000 },
+      { labelKey: 'tool.unit-converter.inch', symbol: 'in', toBase: 0.0254 },
+      { labelKey: 'tool.unit-converter.foot', symbol: 'ft', toBase: 0.3048 },
+      { labelKey: 'tool.unit-converter.yard', symbol: 'yd', toBase: 0.9144 },
+      { labelKey: 'tool.unit-converter.mile', symbol: 'mi', toBase: 1609.344 },
     ],
   },
   weight: {
-    label: '重量',
+    labelKey: 'tool.unit-converter.weight',
     base: 'kg',
     units: [
-      { label: '毫克', symbol: 'mg', toBase: 0.000001 },
-      { label: '克', symbol: 'g', toBase: 0.001 },
-      { label: '千克', symbol: 'kg', toBase: 1 },
-      { label: '吨', symbol: 't', toBase: 1000 },
-      { label: '磅', symbol: 'lb', toBase: 0.45359237 },
-      { label: '盎司', symbol: 'oz', toBase: 0.028349523 },
+      { labelKey: 'tool.unit-converter.mg', symbol: 'mg', toBase: 0.000001 },
+      { labelKey: 'tool.unit-converter.g', symbol: 'g', toBase: 0.001 },
+      { labelKey: 'tool.unit-converter.kg', symbol: 'kg', toBase: 1 },
+      { labelKey: 'tool.unit-converter.ton', symbol: 't', toBase: 1000 },
+      { labelKey: 'tool.unit-converter.pound', symbol: 'lb', toBase: 0.45359237 },
+      { labelKey: 'tool.unit-converter.ounce', symbol: 'oz', toBase: 0.028349523 },
     ],
   },
   temperature: {
-    label: '温度',
+    labelKey: 'tool.unit-converter.temperature',
     base: 'C',
     units: [
-      { label: '摄氏度', symbol: '°C', toBase: 1 },
-      { label: '华氏度', symbol: '°F', toBase: 1 },
-      { label: '开尔文', symbol: 'K', toBase: 1 },
+      { labelKey: 'tool.unit-converter.celsius', symbol: '°C', toBase: 1 },
+      { labelKey: 'tool.unit-converter.fahrenheit', symbol: '°F', toBase: 1 },
+      { labelKey: 'tool.unit-converter.kelvin', symbol: 'K', toBase: 1 },
     ],
   },
   area: {
-    label: '面积',
+    labelKey: 'tool.unit-converter.area',
     base: 'm2',
     units: [
-      { label: '平方毫米', symbol: 'mm²', toBase: 0.000001 },
-      { label: '平方厘米', symbol: 'cm²', toBase: 0.0001 },
-      { label: '平方米', symbol: 'm²', toBase: 1 },
-      { label: '平方千米', symbol: 'km²', toBase: 1000000 },
-      { label: '英亩', symbol: '英亩', toBase: 4046.8564 },
-      { label: '公顷', symbol: '公顷', toBase: 10000 },
+      { labelKey: 'tool.unit-converter.mm2', symbol: 'mm²', toBase: 0.000001 },
+      { labelKey: 'tool.unit-converter.cm2', symbol: 'cm²', toBase: 0.0001 },
+      { labelKey: 'tool.unit-converter.m2', symbol: 'm²', toBase: 1 },
+      { labelKey: 'tool.unit-converter.km2', symbol: 'km²', toBase: 1000000 },
+      { labelKey: 'tool.unit-converter.acre', symbol: 'ac', toBase: 4046.8564 },
+      { labelKey: 'tool.unit-converter.hectare', symbol: 'ha', toBase: 10000 },
     ],
   },
   volume: {
-    label: '体积',
+    labelKey: 'tool.unit-converter.volume',
     base: 'L',
     units: [
-      { label: '毫升', symbol: 'mL', toBase: 0.001 },
-      { label: '升', symbol: 'L', toBase: 1 },
-      { label: '立方米', symbol: 'm³', toBase: 1000 },
-      { label: '美制加仑', symbol: 'gal(美)', toBase: 3.785411784 },
-      { label: '英制加仑', symbol: 'gal(英)', toBase: 4.54609 },
+      { labelKey: 'tool.unit-converter.ml', symbol: 'mL', toBase: 0.001 },
+      { labelKey: 'tool.unit-converter.liter', symbol: 'L', toBase: 1 },
+      { labelKey: 'tool.unit-converter.m3', symbol: 'm³', toBase: 1000 },
+      { labelKey: 'tool.unit-converter.usGallon', symbol: 'gal(US)', toBase: 3.785411784 },
+      { labelKey: 'tool.unit-converter.ukGallon', symbol: 'gal(UK)', toBase: 4.54609 },
     ],
   },
 }
 
-const currentCategory = computed(() => categories[activeCategory.value])
+const currentCategory = computed(() => {
+  const cfg = categoriesConfig[activeCategory.value]
+  return {
+    label: t(cfg.labelKey),
+    base: cfg.base,
+    units: cfg.units.map(u => ({ ...u, label: t(u.labelKey) })),
+  }
+})
 
 const currentUnits = computed(() => currentCategory.value.units)
 
-// Initialize fromUnit when category changes
 const onCategoryChange = (key: CategoryKey) => {
   activeCategory.value = key
   inputValue.value = undefined
   fromUnit.value = currentUnits.value[0]?.symbol ?? ''
 }
 
-// Set initial fromUnit
 fromUnit.value = currentUnits.value[0]?.symbol ?? ''
 
-// Convert temperature to Celsius as base
 const toCelsius = (value: number, symbol: string): number => {
   if (symbol === '°C') return value
   if (symbol === '°F') return (value - 32) * (5 / 9)
@@ -118,7 +124,6 @@ const formatNumber = (n: number): string => {
   if (abs >= 1e15 || (abs < 1e-9 && abs > 0)) {
     return n.toExponential(6)
   }
-  // Trim trailing zeros up to 10 decimal places
   return parseFloat(n.toPrecision(10)).toString()
 }
 
@@ -169,9 +174,9 @@ const tempResults = computed((): TempResult[] => {
   const from = fromUnit.value
   const celsius = toCelsius(val, from)
   return [
-    { unit: '摄氏度', symbol: '°C', value: formatNumber(celsius) },
-    { unit: '华氏度', symbol: '°F', value: formatNumber(fromCelsius(celsius, '°F')) },
-    { unit: '开尔文', symbol: 'K', value: formatNumber(fromCelsius(celsius, 'K')) },
+    { unit: t('tool.unit-converter.celsius'), symbol: '°C', value: formatNumber(celsius) },
+    { unit: t('tool.unit-converter.fahrenheit'), symbol: '°F', value: formatNumber(fromCelsius(celsius, '°F')) },
+    { unit: t('tool.unit-converter.kelvin'), symbol: 'K', value: formatNumber(fromCelsius(celsius, 'K')) },
   ]
 })
 
@@ -181,20 +186,22 @@ const displayResults = computed(() => {
 })
 
 const handleCopy = (row: ResultRow | TempResult) => {
-  copyToClipboard(row.value, `已复制 ${row.value} ${row.symbol}`)
+  copyToClipboard(row.value, t('tool.unit-converter.copied', { value: row.value, symbol: row.symbol }))
 }
 
-const categoryTabs = (Object.keys(categories) as CategoryKey[]).map((k) => ({
-  key: k,
-  label: categories[k].label,
-}))
+const categoryTabs = computed(() =>
+  (Object.keys(categoriesConfig) as CategoryKey[]).map((k) => ({
+    key: k,
+    label: t(categoriesConfig[k].labelKey),
+  }))
+)
 </script>
 
 <template>
   <div class="max-w-5xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">单位换算</h1>
-      <p class="text-gray-500">支持长度、重量、温度、面积、体积等常用单位互转</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.unit-converter.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.unit-converter.subtitle') }}</p>
     </div>
 
     <el-card>
@@ -213,7 +220,7 @@ const categoryTabs = (Object.keys(categories) as CategoryKey[]).map((k) => ({
       <div class="flex items-center gap-4 mt-4 mb-6">
         <el-input-number
           v-model="inputValue"
-          :placeholder="'输入' + currentCategory.label + '数值'"
+          :placeholder="t('tool.unit-converter.inputPlaceholder', { category: currentCategory.label })"
           :controls="false"
           class="flex-1"
           style="width: 100%"
@@ -230,14 +237,14 @@ const categoryTabs = (Object.keys(categories) as CategoryKey[]).map((k) => ({
 
       <div v-if="displayResults.length > 0">
         <el-table :data="displayResults" stripe border>
-          <el-table-column label="单位" prop="label" min-width="120" />
-          <el-table-column label="符号" prop="symbol" width="100" />
-          <el-table-column label="换算结果" prop="value" min-width="200">
+          <el-table-column :label="t('tool.unit-converter.unitCol')" prop="label" min-width="120" />
+          <el-table-column :label="t('tool.unit-converter.symbolCol')" prop="symbol" width="100" />
+          <el-table-column :label="t('tool.unit-converter.resultCol')" prop="value" min-width="200">
             <template #default="{ row }">
               <span class="font-mono">{{ row.value }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="80" align="center">
+          <el-table-column :label="t('tool.unit-converter.actionCol')" width="80" align="center">
             <template #default="{ row }">
               <el-button
                 link
@@ -245,14 +252,14 @@ const categoryTabs = (Object.keys(categories) as CategoryKey[]).map((k) => ({
                 size="small"
                 @click="handleCopy(row)"
               >
-                复制
+                {{ t('common.copy') }}
               </el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
 
-      <el-empty v-else description="请输入数值并选择源单位" />
+      <el-empty v-else :description="t('tool.unit-converter.emptyHint')" />
     </el-card>
   </div>
 </template>

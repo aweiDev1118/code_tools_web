@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import CryptoJS from 'crypto-js'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const input = ref('')
 const uppercase = ref(false)
@@ -40,20 +43,20 @@ const clear = () => {
 <template>
   <div class="max-w-4xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Hash 生成</h1>
-      <p class="text-gray-500">计算文本的各种 Hash 值</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.hash-generator.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.hash-generator.subtitle') }}</p>
     </div>
 
     <el-card class="mb-4">
       <div class="flex gap-2 mb-4">
-        <el-checkbox v-model="uppercase">大写输出</el-checkbox>
-        <el-button @click="clear" class="ml-auto">清空</el-button>
+        <el-checkbox v-model="uppercase">{{ t('tool.hash-generator.uppercaseOutput') }}</el-checkbox>
+        <el-button @click="clear" class="ml-auto">{{ t('common.clear') }}</el-button>
       </div>
       <el-input
         v-model="input"
         type="textarea"
         :rows="4"
-        placeholder="请输入要计算 Hash 的文本..."
+        :placeholder="t('tool.hash-generator.inputPlaceholder')"
       />
     </el-card>
 
@@ -61,7 +64,7 @@ const clear = () => {
       <el-card v-for="(value, key) in hashes" :key="key">
         <div class="flex items-center justify-between mb-2">
           <span class="font-semibold uppercase">{{ key }}</span>
-          <el-button size="small" @click="copy(value)">复制</el-button>
+          <el-button size="small" @click="copy(value)">{{ t('common.copy') }}</el-button>
         </div>
         <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded font-mono text-sm break-all">
           {{ value }}
@@ -69,6 +72,6 @@ const clear = () => {
       </el-card>
     </div>
 
-    <el-empty v-else description="输入文本后显示 Hash 结果" />
+    <el-empty v-else :description="t('tool.hash-generator.emptyHint')" />
   </div>
 </template>

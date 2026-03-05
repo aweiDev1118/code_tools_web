@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const hexColor = ref('#3b82f6')
 
@@ -81,7 +84,7 @@ const copy = (text: string) => {
 
 const colorFormats = computed(() => [
   { label: 'HEX', value: hexColor.value.toUpperCase() },
-  { label: 'HEX (小写)', value: hexColor.value.toLowerCase() },
+  { label: t('tool.color-converter.hexLower'), value: hexColor.value.toLowerCase() },
   { label: 'RGB', value: rgbString.value },
   { label: 'RGBA', value: rgbaString.value },
   { label: 'HSL', value: hslString.value },
@@ -91,13 +94,13 @@ const colorFormats = computed(() => [
 <template>
   <div class="max-w-4xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">颜色转换</h1>
-      <p class="text-gray-500">HEX、RGB、HSL 颜色格式互转</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.color-converter.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.color-converter.subtitle') }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <el-card>
-        <template #header>选择颜色</template>
+        <template #header>{{ t('tool.color-converter.selectColor') }}</template>
         <div class="flex flex-col items-center gap-6">
           <el-color-picker
             v-model="hexColor"
@@ -125,7 +128,7 @@ const colorFormats = computed(() => [
       </el-card>
 
       <el-card>
-        <template #header>颜色值</template>
+        <template #header>{{ t('tool.color-converter.colorValues') }}</template>
         <div class="space-y-3">
           <div
             v-for="format in colorFormats"
@@ -136,7 +139,7 @@ const colorFormats = computed(() => [
               <div class="text-sm text-gray-500">{{ format.label }}</div>
               <div class="font-mono">{{ format.value }}</div>
             </div>
-            <el-button size="small" @click="copy(format.value)">复制</el-button>
+            <el-button size="small" @click="copy(format.value)">{{ t('common.copy') }}</el-button>
           </div>
         </div>
 

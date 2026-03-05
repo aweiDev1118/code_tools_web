@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const decimal = ref('')
 const binary = ref('')
@@ -22,7 +25,7 @@ const convert = (value: string, fromBase: number) => {
   try {
     const num = parseInt(value, fromBase)
     if (isNaN(num)) {
-      ElMessage.error('无效的数值')
+      ElMessage.error(t('tool.number-converter.invalidValue'))
       return
     }
 
@@ -31,7 +34,7 @@ const convert = (value: string, fromBase: number) => {
     if (activeField.value !== 'octal') octal.value = num.toString(8)
     if (activeField.value !== 'hex') hex.value = num.toString(16).toUpperCase()
   } catch {
-    ElMessage.error('转换失败')
+    ElMessage.error(t('tool.number-converter.convertFailed'))
   }
 }
 
@@ -64,71 +67,71 @@ const clear = () => {
 <template>
   <div class="max-w-3xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">进制转换</h1>
-      <p class="text-gray-500">2进制、8进制、10进制、16进制互相转换</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.number-converter.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.number-converter.subtitle') }}</p>
     </div>
 
     <div class="mb-4">
-      <el-button @click="clear">清空</el-button>
+      <el-button @click="clear">{{ t('common.clear') }}</el-button>
     </div>
 
     <el-card>
       <div class="space-y-6">
         <div class="flex items-center gap-4">
-          <div class="w-24 text-right font-medium">十进制</div>
+          <div class="w-24 text-right font-medium">{{ t('tool.number-converter.decimal') }}</div>
           <el-input
             v-model="decimal"
-            placeholder="输入十进制数"
+            :placeholder="t('tool.number-converter.decimalPlaceholder')"
             class="font-mono flex-1"
             @focus="activeField = 'decimal'"
           >
             <template #append>
-              <el-button @click="copy(decimal)">复制</el-button>
+              <el-button @click="copy(decimal)">{{ t('common.copy') }}</el-button>
             </template>
           </el-input>
         </div>
 
         <div class="flex items-center gap-4">
-          <div class="w-24 text-right font-medium">二进制</div>
+          <div class="w-24 text-right font-medium">{{ t('tool.number-converter.binary') }}</div>
           <el-input
             v-model="binary"
-            placeholder="输入二进制数 (0/1)"
+            :placeholder="t('tool.number-converter.binaryPlaceholder')"
             class="font-mono flex-1"
             @focus="activeField = 'binary'"
           >
             <template #prepend>0b</template>
             <template #append>
-              <el-button @click="copy(binary)">复制</el-button>
+              <el-button @click="copy(binary)">{{ t('common.copy') }}</el-button>
             </template>
           </el-input>
         </div>
 
         <div class="flex items-center gap-4">
-          <div class="w-24 text-right font-medium">八进制</div>
+          <div class="w-24 text-right font-medium">{{ t('tool.number-converter.octal') }}</div>
           <el-input
             v-model="octal"
-            placeholder="输入八进制数 (0-7)"
+            :placeholder="t('tool.number-converter.octalPlaceholder')"
             class="font-mono flex-1"
             @focus="activeField = 'octal'"
           >
             <template #prepend>0o</template>
             <template #append>
-              <el-button @click="copy(octal)">复制</el-button>
+              <el-button @click="copy(octal)">{{ t('common.copy') }}</el-button>
             </template>
           </el-input>
         </div>
 
         <div class="flex items-center gap-4">
-          <div class="w-24 text-right font-medium">十六进制</div>
+          <div class="w-24 text-right font-medium">{{ t('tool.number-converter.hexadecimal') }}</div>
           <el-input
             v-model="hex"
-            placeholder="输入十六进制数 (0-9, A-F)"
+            :placeholder="t('tool.number-converter.hexPlaceholder')"
             class="font-mono flex-1"
             @focus="activeField = 'hex'"
           >
             <template #prepend>0x</template>
             <template #append>
-              <el-button @click="copy(hex)">复制</el-button>
+              <el-button @click="copy(hex)">{{ t('common.copy') }}</el-button>
             </template>
           </el-input>
         </div>
@@ -136,7 +139,7 @@ const clear = () => {
     </el-card>
 
     <el-alert class="mt-4" type="info" :closable="false">
-      在任意输入框中输入数值，其他进制会自动转换
+      {{ t('tool.number-converter.autoConvertHint') }}
     </el-alert>
   </div>
 </template>

@@ -378,6 +378,7 @@ export const getToolsByCategory = (categoryId: string): Tool[] => {
 export const searchTools = (keyword: string): Tool[] => {
   const lowerKeyword = keyword.toLowerCase()
   return tools.filter(tool =>
+    tool.id.toLowerCase().includes(lowerKeyword) ||
     tool.name.toLowerCase().includes(lowerKeyword) ||
     tool.description.toLowerCase().includes(lowerKeyword) ||
     tool.keywords.some(k => k.includes(lowerKeyword))

@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { copyToClipboard } from '@/utils/clipboard'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const input = ref('')
 const output = ref('')
@@ -17,9 +20,9 @@ const encode = () => {
       }
       return char
     }).join('')
-    ElMessage.success('编码成功')
+    ElMessage.success(t('tool.unicode.encodeSuccess'))
   } catch {
-    ElMessage.error('编码失败')
+    ElMessage.error(t('tool.unicode.encodeFail'))
   }
 }
 
@@ -29,9 +32,9 @@ const decode = () => {
     output.value = input.value.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => {
       return String.fromCharCode(parseInt(hex, 16))
     })
-    ElMessage.success('解码成功')
+    ElMessage.success(t('tool.unicode.decodeSuccess'))
   } catch {
-    ElMessage.error('解码失败')
+    ElMessage.error(t('tool.unicode.decodeFail'))
   }
 }
 
@@ -72,49 +75,49 @@ const loadSample = () => {
 <template>
   <div class="max-w-6xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Unicode 转换</h1>
-      <p class="text-gray-500">Unicode 编码与中文互相转换</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.unicode.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.unicode.subtitle') }}</p>
     </div>
 
     <div class="mb-4 flex flex-wrap gap-2 items-center">
       <el-radio-group v-model="mode">
-        <el-radio-button value="encode">中文 → Unicode</el-radio-button>
-        <el-radio-button value="decode">Unicode → 中文</el-radio-button>
+        <el-radio-button value="encode">{{ t('tool.unicode.toUnicode') }}</el-radio-button>
+        <el-radio-button value="decode">{{ t('tool.unicode.toText') }}</el-radio-button>
       </el-radio-group>
-      <el-button type="primary" @click="convert">转换</el-button>
+      <el-button type="primary" @click="convert">{{ t('common.convert') }}</el-button>
       <el-button @click="swap">
         <el-icon><Switch /></el-icon>
-        交换
+        {{ t('tool.unicode.swap') }}
       </el-button>
-      <el-button @click="copy">复制结果</el-button>
-      <el-button @click="clear">清空</el-button>
-      <el-button @click="loadSample" text>示例</el-button>
+      <el-button @click="copy">{{ t('tool.unicode.copyResult') }}</el-button>
+      <el-button @click="clear">{{ t('common.clear') }}</el-button>
+      <el-button @click="loadSample" text>{{ t('tool.unicode.sample') }}</el-button>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <el-card>
         <template #header>
-          {{ mode === 'encode' ? '中文文本' : 'Unicode 编码' }}
+          {{ mode === 'encode' ? t('tool.unicode.chineseText') : t('tool.unicode.unicodeCode') }}
         </template>
         <el-input
           v-model="input"
           type="textarea"
           :rows="12"
-          :placeholder="mode === 'encode' ? '请输入中文文本...' : '请输入 Unicode 编码，如 \\u4f60\\u597d'"
+          :placeholder="mode === 'encode' ? t('tool.unicode.encodePlaceholder') : t('tool.unicode.decodePlaceholder')"
           class="font-mono"
         />
       </el-card>
 
       <el-card>
         <template #header>
-          {{ mode === 'encode' ? 'Unicode 编码' : '中文文本' }}
+          {{ mode === 'encode' ? t('tool.unicode.unicodeCode') : t('tool.unicode.chineseText') }}
         </template>
         <el-input
           v-model="output"
           type="textarea"
           :rows="12"
           readonly
-          placeholder="转换结果..."
+          :placeholder="t('tool.unicode.resultPlaceholder')"
           class="font-mono"
         />
       </el-card>

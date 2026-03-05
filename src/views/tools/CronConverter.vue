@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { CronField, CronFieldType } from '@/utils/cron'
 import {
   getDefaultCronState,
@@ -12,6 +13,8 @@ import {
 import { parseCronExpression, describeCronExpression, getNextRunTimes } from '@/utils/cronParser'
 import { copyToClipboard } from '@/utils/clipboard'
 
+const { t } = useI18n()
+
 // ─── State ───────────────────────────────────────────────────────────────────
 
 const cronState = ref(getDefaultCronState())
@@ -21,17 +24,17 @@ const reverseError = ref('')
 
 // ─── Tab field definitions ────────────────────────────────────────────────────
 
-const tabFields = [
-  { key: 'second', label: '秒', name: 'second' },
-  { key: 'minute', label: '分', name: 'minute' },
-  { key: 'hour', label: '时', name: 'hour' },
-  { key: 'day', label: '日', name: 'day' },
-  { key: 'month', label: '月', name: 'month' },
-  { key: 'week', label: '周', name: 'week' },
-  { key: 'year', label: '年', name: 'year' },
-] as const
+const tabFields = computed(() => [
+  { key: 'second', label: t('tool.cron-converter.second'), name: 'second' },
+  { key: 'minute', label: t('tool.cron-converter.minute'), name: 'minute' },
+  { key: 'hour', label: t('tool.cron-converter.hour'), name: 'hour' },
+  { key: 'day', label: t('tool.cron-converter.day'), name: 'day' },
+  { key: 'month', label: t('tool.cron-converter.month'), name: 'month' },
+  { key: 'week', label: t('tool.cron-converter.week'), name: 'week' },
+  { key: 'year', label: t('tool.cron-converter.year'), name: 'year' },
+] as const)
 
-type TabKey = (typeof tabFields)[number]['key']
+type TabKey = 'second' | 'minute' | 'hour' | 'day' | 'month' | 'week' | 'year'
 
 // ─── Computed ─────────────────────────────────────────────────────────────────
 
@@ -83,7 +86,7 @@ function getFieldValues(key: TabKey): number[] {
 }
 
 function getCheckboxLabel(key: TabKey, v: number): string {
-  if (key === 'week') return `星期${WEEK_LABELS[v]}`
+  if (key === 'week') return t('tool.cron-converter.weekPrefix') + WEEK_LABELS[v]
   if (key === 'month') return MONTH_LABELS[v - 1]
   return String(v)
 }
@@ -113,14 +116,14 @@ function resetCron() {
 
 function reverseParse() {
   if (!reverseInput.value.trim()) {
-    reverseError.value = '请输入 Cron 表达式'
+    reverseError.value = t('tool.cron-converter.inputRequired')
     return
   }
   try {
     cronState.value = parseCronExpression(reverseInput.value)
     reverseError.value = ''
   } catch {
-    reverseError.value = '无效的 Cron 表达式'
+    reverseError.value = t('tool.cron-converter.invalidExpression')
   }
 }
 
@@ -135,10 +138,10 @@ type RadioOption = { label: string; value: CronFieldType }
 function getCommonOptions(key: TabKey): RadioOption[] {
   const range = FIELD_RANGES[key]
   return [
-    { label: `每${range.label}`, value: 'every' },
-    { label: '范围', value: 'range' },
-    { label: '指定', value: 'specific' },
-    { label: '间隔', value: 'interval' },
+    { label: t('tool.cron-converter.every') + range.label, value: 'every' },
+    { label: t('tool.cron-converter.range'), value: 'range' },
+    { label: t('tool.cron-converter.specific'), value: 'specific' },
+    { label: t('tool.cron-converter.interval'), value: 'interval' },
   ]
 }
 </script>
@@ -147,18 +150,18 @@ function getCommonOptions(key: TabKey): RadioOption[] {
   <div class="max-w-4xl mx-auto">
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Cron 表达式</h1>
-      <p class="text-gray-500 dark:text-gray-400">通过选项生成 Cron 表达式，支持反向解析</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.cron-converter.name') }}</h1>
+      <p class="text-gray-500 dark:text-gray-400">{{ t('tool.cron-converter.subtitle') }}</p>
     </div>
 
     <!-- Expression Result Card -->
     <el-card class="mb-6">
       <template #header>
         <div class="flex items-center justify-between">
-          <span class="font-semibold">生成结果</span>
+          <span class="font-semibold">{{ t('tool.cron-converter.generatedResult') }}</span>
           <div class="flex gap-2">
-            <el-button size="small" @click="copyToClipboard(cronExpression)">复制</el-button>
-            <el-button size="small" @click="resetCron">重置</el-button>
+            <el-button size="small" @click="copyToClipboard(cronExpression)">{{ t('common.copy') }}</el-button>
+            <el-button size="small" @click="resetCron">{{ t('common.reset') }}</el-button>
           </div>
         </div>
       </template>
@@ -173,7 +176,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
     <!-- Common Presets Card -->
     <el-card class="mb-6">
       <template #header>
-        <span class="font-semibold">常用表达式</span>
+        <span class="font-semibold">{{ t('tool.cron-converter.commonPresets') }}</span>
       </template>
       <div class="flex flex-wrap gap-2">
         <el-button
@@ -191,7 +194,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
     <!-- Tab-based Field Editor Card -->
     <el-card class="mb-6">
       <template #header>
-        <span class="font-semibold">字段配置</span>
+        <span class="font-semibold">{{ t('tool.cron-converter.fieldConfig') }}</span>
       </template>
       <el-tabs v-model="activeTab" type="border-card">
         <el-tab-pane
@@ -218,16 +221,16 @@ function getCommonOptions(key: TabKey): RadioOption[] {
 
                 <!-- Day-specific extra options -->
                 <template v-if="tab.key === 'day'">
-                  <el-radio-button value="noSpecific">不指定</el-radio-button>
-                  <el-radio-button value="last">最后一天</el-radio-button>
-                  <el-radio-button value="weekday">最近工作日</el-radio-button>
+                  <el-radio-button value="noSpecific">{{ t('tool.cron-converter.noSpecific') }}</el-radio-button>
+                  <el-radio-button value="last">{{ t('tool.cron-converter.lastDay') }}</el-radio-button>
+                  <el-radio-button value="weekday">{{ t('tool.cron-converter.nearestWeekday') }}</el-radio-button>
                 </template>
 
                 <!-- Week-specific extra options -->
                 <template v-if="tab.key === 'week'">
-                  <el-radio-button value="noSpecific">不指定</el-radio-button>
-                  <el-radio-button value="lastWeekday">最后一个</el-radio-button>
-                  <el-radio-button value="nthWeekday">第N个</el-radio-button>
+                  <el-radio-button value="noSpecific">{{ t('tool.cron-converter.noSpecific') }}</el-radio-button>
+                  <el-radio-button value="lastWeekday">{{ t('tool.cron-converter.lastOne') }}</el-radio-button>
+                  <el-radio-button value="nthWeekday">{{ t('tool.cron-converter.nthOne') }}</el-radio-button>
                 </template>
               </el-radio-group>
             </div>
@@ -236,7 +239,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
 
             <!-- Range -->
             <div v-if="getField(tab.key).type === 'range'" class="flex items-center gap-3 flex-wrap">
-              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">从</span>
+              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">{{ t('tool.cron-converter.from') }}</span>
               <el-input-number
                 :model-value="getField(tab.key).start"
                 :min="FIELD_RANGES[tab.key].min"
@@ -244,7 +247,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
                 size="small"
                 @update:model-value="(val: number) => updateField(tab.key, { start: val })"
               />
-              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">到</span>
+              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">{{ t('tool.cron-converter.to') }}</span>
               <el-input-number
                 :model-value="getField(tab.key).end"
                 :min="FIELD_RANGES[tab.key].min"
@@ -271,7 +274,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
 
             <!-- Interval -->
             <div v-else-if="getField(tab.key).type === 'interval'" class="flex items-center gap-3 flex-wrap">
-              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">从</span>
+              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">{{ t('tool.cron-converter.from') }}</span>
               <el-input-number
                 :model-value="getField(tab.key).start"
                 :min="FIELD_RANGES[tab.key].min"
@@ -279,7 +282,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
                 size="small"
                 @update:model-value="(val: number) => updateField(tab.key, { start: val })"
               />
-              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">开始，每</span>
+              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">{{ t('tool.cron-converter.startEvery') }}</span>
               <el-input-number
                 :model-value="getField(tab.key).interval"
                 :min="1"
@@ -299,12 +302,12 @@ function getCommonOptions(key: TabKey): RadioOption[] {
                 size="small"
                 @update:model-value="(val: number) => updateField(tab.key, { start: val })"
               />
-              <span class="text-gray-600 dark:text-gray-400 text-sm">号最近的工作日</span>
+              <span class="text-gray-600 dark:text-gray-400 text-sm">{{ t('tool.cron-converter.nearestWeekdayOf') }}</span>
             </div>
 
             <!-- Week: Last weekday -->
             <div v-else-if="getField(tab.key).type === 'lastWeekday'" class="flex items-center gap-3 flex-wrap">
-              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">最后一个</span>
+              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">{{ t('tool.cron-converter.lastOneOf') }}</span>
               <el-select
                 :model-value="getField(tab.key).start"
                 size="small"
@@ -315,14 +318,14 @@ function getCommonOptions(key: TabKey): RadioOption[] {
                   v-for="(wLabel, idx) in WEEK_LABELS"
                   :key="idx"
                   :value="idx"
-                  :label="`星期${wLabel}`"
+                  :label="t('tool.cron-converter.weekPrefix') + wLabel"
                 />
               </el-select>
             </div>
 
             <!-- Week: Nth weekday -->
             <div v-else-if="getField(tab.key).type === 'nthWeekday'" class="flex items-center gap-3 flex-wrap">
-              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">第</span>
+              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">{{ t('tool.cron-converter.the') }}</span>
               <el-input-number
                 :model-value="getField(tab.key).nth"
                 :min="1"
@@ -330,7 +333,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
                 size="small"
                 @update:model-value="(val: number) => updateField(tab.key, { nth: val })"
               />
-              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">个</span>
+              <span class="text-gray-600 dark:text-gray-400 text-sm whitespace-nowrap">{{ t('tool.cron-converter.nth') }}</span>
               <el-select
                 :model-value="getField(tab.key).week"
                 size="small"
@@ -341,7 +344,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
                   v-for="(wLabel, idx) in WEEK_LABELS"
                   :key="idx"
                   :value="idx"
-                  :label="`星期${wLabel}`"
+                  :label="t('tool.cron-converter.weekPrefix') + wLabel"
                 />
               </el-select>
             </div>
@@ -351,9 +354,9 @@ function getCommonOptions(key: TabKey): RadioOption[] {
               v-else-if="['every', 'noSpecific', 'last'].includes(getField(tab.key).type)"
               class="text-gray-400 dark:text-gray-500 text-sm py-2"
             >
-              <template v-if="getField(tab.key).type === 'every'">每{{ FIELD_RANGES[tab.key].label }}执行</template>
-              <template v-else-if="getField(tab.key).type === 'noSpecific'">不指定（使用 ?）</template>
-              <template v-else-if="getField(tab.key).type === 'last'">每月最后一天（使用 L）</template>
+              <template v-if="getField(tab.key).type === 'every'">{{ t('tool.cron-converter.every') }}{{ FIELD_RANGES[tab.key].label }}{{ t('tool.cron-converter.execute') }}</template>
+              <template v-else-if="getField(tab.key).type === 'noSpecific'">{{ t('tool.cron-converter.noSpecificDesc') }}</template>
+              <template v-else-if="getField(tab.key).type === 'last'">{{ t('tool.cron-converter.lastDayDesc') }}</template>
             </div>
           </div>
         </el-tab-pane>
@@ -363,17 +366,17 @@ function getCommonOptions(key: TabKey): RadioOption[] {
     <!-- Reverse Parsing Card -->
     <el-card class="mb-6">
       <template #header>
-        <span class="font-semibold">反向解析</span>
+        <span class="font-semibold">{{ t('tool.cron-converter.reverseParse') }}</span>
       </template>
       <div class="flex gap-2 mb-3">
         <el-input
           v-model="reverseInput"
-          placeholder="输入 Cron 表达式，如: 0 0/5 * * * ? *"
+          :placeholder="t('tool.cron-converter.reversePlaceholder')"
           class="font-mono"
           clearable
           @keyup.enter="reverseParse"
         />
-        <el-button type="primary" @click="reverseParse">解析</el-button>
+        <el-button type="primary" @click="reverseParse">{{ t('common.parse') }}</el-button>
       </div>
       <el-tag v-if="reverseError" type="danger">{{ reverseError }}</el-tag>
     </el-card>
@@ -381,7 +384,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
     <!-- Next Execution Times Card -->
     <el-card class="mb-6">
       <template #header>
-        <span class="font-semibold">最近10次执行时间</span>
+        <span class="font-semibold">{{ t('tool.cron-converter.nextRunTimes') }}</span>
       </template>
       <div v-if="nextRunTimes.length" class="space-y-2">
         <div
@@ -393,7 +396,7 @@ function getCommonOptions(key: TabKey): RadioOption[] {
           <span class="font-mono text-sm text-gray-700 dark:text-gray-300">{{ formatDate(time) }}</span>
         </div>
       </div>
-      <div v-else class="text-gray-400 dark:text-gray-500 text-center py-4">无法计算执行时间</div>
+      <div v-else class="text-gray-400 dark:text-gray-500 text-center py-4">{{ t('tool.cron-converter.cannotCalculate') }}</div>
     </el-card>
   </div>
 </template>

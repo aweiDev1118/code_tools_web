@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const input = ref('')
 const output = ref('')
@@ -67,7 +70,6 @@ const formatCss = (code: string) => {
 }
 
 const formatJs = (code: string) => {
-  // 简单的 JS 格式化
   let formatted = code
     .replace(/\s*{\s*/g, ' {\n')
     .replace(/\s*}\s*/g, '\n}\n')
@@ -111,7 +113,7 @@ const formatSql = (code: string) => {
 
 const format = () => {
   if (!input.value.trim()) {
-    ElMessage.warning('请输入代码')
+    ElMessage.warning(t('tool.code-formatter.inputRequired'))
     return
   }
 
@@ -135,9 +137,9 @@ const format = () => {
       default:
         output.value = input.value
     }
-    ElMessage.success('格式化成功')
+    ElMessage.success(t('tool.code-formatter.formatSuccess'))
   } catch (e) {
-    ElMessage.error('格式化失败: ' + (e as Error).message)
+    ElMessage.error(t('tool.code-formatter.formatFailed') + ': ' + (e as Error).message)
   }
 }
 
@@ -150,9 +152,9 @@ const compress = () => {
     } else {
       output.value = input.value.replace(/\s+/g, ' ').replace(/\s*([{}:;,])\s*/g, '$1').trim()
     }
-    ElMessage.success('压缩成功')
+    ElMessage.success(t('tool.code-formatter.compressSuccess'))
   } catch (e) {
-    ElMessage.error('压缩失败')
+    ElMessage.error(t('tool.code-formatter.compressFailed'))
   }
 }
 
@@ -190,8 +192,8 @@ const loadSample = () => {
 <template>
   <div class="max-w-6xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">代码格式化</h1>
-      <p class="text-gray-500">格式化 JSON、HTML、CSS、JavaScript、SQL 代码</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.code-formatter.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.code-formatter.subtitle') }}</p>
     </div>
 
     <div class="mb-4 flex flex-wrap gap-2 items-center">
@@ -199,39 +201,39 @@ const loadSample = () => {
         <el-option v-for="lang in languages" :key="lang.value" :value="lang.value" :label="lang.label" />
       </el-select>
       <div class="flex items-center gap-2">
-        <span class="text-sm">缩进:</span>
+        <span class="text-sm">{{ t('tool.code-formatter.indent') }}:</span>
         <el-select v-model="indentSize" style="width: 100px">
-          <el-option :value="2" label="2 空格" />
-          <el-option :value="4" label="4 空格" />
+          <el-option :value="2" :label="t('tool.code-formatter.twoSpaces')" />
+          <el-option :value="4" :label="t('tool.code-formatter.fourSpaces')" />
         </el-select>
       </div>
-      <el-button type="primary" @click="format">格式化</el-button>
-      <el-button @click="compress">压缩</el-button>
-      <el-button @click="copy">复制结果</el-button>
-      <el-button @click="clear">清空</el-button>
-      <el-button @click="loadSample" text>示例</el-button>
+      <el-button type="primary" @click="format">{{ t('common.format') }}</el-button>
+      <el-button @click="compress">{{ t('common.compress') }}</el-button>
+      <el-button @click="copy">{{ t('tool.code-formatter.copyResult') }}</el-button>
+      <el-button @click="clear">{{ t('common.clear') }}</el-button>
+      <el-button @click="loadSample" text>{{ t('tool.code-formatter.sample') }}</el-button>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <el-card>
-        <template #header>输入代码</template>
+        <template #header>{{ t('tool.code-formatter.inputCode') }}</template>
         <el-input
           v-model="input"
           type="textarea"
           :rows="18"
-          placeholder="请输入要格式化的代码..."
+          :placeholder="t('tool.code-formatter.inputPlaceholder')"
           class="font-mono"
         />
       </el-card>
 
       <el-card>
-        <template #header>格式化结果</template>
+        <template #header>{{ t('tool.code-formatter.formattedResult') }}</template>
         <el-input
           v-model="output"
           type="textarea"
           :rows="18"
           readonly
-          placeholder="格式化结果..."
+          :placeholder="t('tool.code-formatter.outputPlaceholder')"
           class="font-mono"
         />
       </el-card>

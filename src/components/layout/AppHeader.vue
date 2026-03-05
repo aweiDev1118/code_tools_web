@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { searchTools } from '@/config/tools'
+import { localeOptions, setLocale, type LocaleKey } from '@/i18n'
 
 type ThemeMode = 'light' | 'dark' | 'system'
 
@@ -15,12 +17,15 @@ const emit = defineEmits<{
   toggleSidebar: []
 }>()
 
+const { t } = useI18n()
+
+// Theme dropdown
 const showThemeMenu = ref(false)
 
-const themeOptions: { value: ThemeMode; label: string; icon: string }[] = [
-  { value: 'light', label: '浅色', icon: 'Sunny' },
-  { value: 'dark', label: '深色', icon: 'Moon' },
-  { value: 'system', label: '跟随系统', icon: 'Monitor' },
+const themeOptions: { value: ThemeMode; labelKey: string; icon: string }[] = [
+  { value: 'light', labelKey: 'theme.light', icon: 'Sunny' },
+  { value: 'dark', labelKey: 'theme.dark', icon: 'Moon' },
+  { value: 'system', labelKey: 'theme.system', icon: 'Monitor' },
 ]
 
 const currentThemeIcon = () => {
@@ -33,12 +38,51 @@ const selectTheme = (mode: ThemeMode) => {
   showThemeMenu.value = false
 }
 
-const hideThemeMenu = () => {
-  setTimeout(() => {
-    showThemeMenu.value = false
-  }, 150)
+// Locale dropdown
+const showLocaleMenu = ref(false)
+
+const currentLocaleOption = () => {
+  const saved = (localStorage.getItem('locale') as LocaleKey) || 'zh-CN'
+  return localeOptions.find((o) => o.value === saved) ?? localeOptions[0]
 }
 
+const selectLocale = (locale: LocaleKey) => {
+  setLocale(locale)
+  showLocaleMenu.value = false
+}
+
+// Click-outside to close dropdowns
+const themeDropdownRef = ref<HTMLElement | null>(null)
+const localeDropdownRef = ref<HTMLElement | null>(null)
+
+const handleDocumentClick = (e: MouseEvent) => {
+  const target = e.target as Node
+  if (showThemeMenu.value && themeDropdownRef.value && !themeDropdownRef.value.contains(target)) {
+    showThemeMenu.value = false
+  }
+  if (showLocaleMenu.value && localeDropdownRef.value && !localeDropdownRef.value.contains(target)) {
+    showLocaleMenu.value = false
+  }
+}
+
+const handleEscape = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    showThemeMenu.value = false
+    showLocaleMenu.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleDocumentClick, true)
+  document.addEventListener('keydown', handleEscape)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleDocumentClick, true)
+  document.removeEventListener('keydown', handleEscape)
+})
+
+// Search
 const router = useRouter()
 const searchKeyword = ref('')
 const searchResults = ref<ReturnType<typeof searchTools>>([])
@@ -73,7 +117,7 @@ const hideResults = () => {
       <!-- Logo -->
       <div class="header-left">
         <button class="menu-btn" @click="emit('toggleSidebar')">
-          <el-icon size="20"><Fold /></el-icon>
+          <el-icon size="18"><Fold /></el-icon>
         </button>
         <router-link to="/" class="logo">
           <div class="logo-icon">
@@ -90,7 +134,7 @@ const hideResults = () => {
           <input
             v-model="searchKeyword"
             type="text"
-            placeholder="搜索工具..."
+            :placeholder="t('common.search')"
             class="search-input"
             @input="handleSearch"
             @blur="hideResults"
@@ -99,65 +143,111 @@ const hideResults = () => {
         </div>
 
         <!-- Search Results Dropdown -->
-        <transition name="fade">
+        <transition name="search-drop">
           <div v-if="showResults && searchResults.length > 0" class="search-results">
-            <div
-              v-for="tool in searchResults.slice(0, 6)"
-              :key="tool.id"
-              class="search-result-item"
-              @mousedown="goToTool(tool.id)"
-            >
-              <div class="result-icon">
-                <el-icon><component :is="tool.icon" /></el-icon>
-              </div>
-              <div class="result-info">
-                <div class="result-name">{{ tool.name }}</div>
-                <div class="result-desc">{{ tool.description }}</div>
+            <div class="search-results-inner">
+              <div
+                v-for="tool in searchResults.slice(0, 6)"
+                :key="tool.id"
+                class="search-result-item"
+                @mousedown="goToTool(tool.id)"
+              >
+                <div class="result-icon">
+                  <el-icon><component :is="tool.icon" /></el-icon>
+                </div>
+                <div class="result-info">
+                  <div class="result-name">{{ tool.name }}</div>
+                  <div class="result-desc">{{ tool.description }}</div>
+                </div>
+                <el-icon class="result-arrow" size="14"><ArrowRight /></el-icon>
               </div>
             </div>
           </div>
         </transition>
 
-        <div
-          v-if="showResults && searchKeyword && searchResults.length === 0"
-          class="search-results search-empty"
-        >
-          <el-icon size="32" class="text-gray-300"><Search /></el-icon>
-          <p>未找到相关工具</p>
-        </div>
+        <transition name="search-drop">
+          <div
+            v-if="showResults && searchKeyword && searchResults.length === 0"
+            class="search-results search-empty"
+          >
+            <el-icon size="28" class="empty-icon"><Search /></el-icon>
+            <p>{{ t('common.searchEmpty') }}</p>
+          </div>
+        </transition>
       </div>
 
       <!-- Actions -->
       <div class="header-right">
-        <div class="theme-dropdown" tabindex="0" @blur="hideThemeMenu">
-          <button class="action-btn theme-trigger" @click="showThemeMenu = !showThemeMenu">
-            <el-icon size="18">
-              <component :is="currentThemeIcon()" />
-            </el-icon>
-            <el-icon size="12" class="chevron" :class="{ open: showThemeMenu }">
+        <!-- Locale Dropdown -->
+        <div ref="localeDropdownRef" class="dropdown-wrapper">
+          <button class="action-btn dropdown-trigger" @click="showLocaleMenu = !showLocaleMenu; showThemeMenu = false">
+            <span class="flag-emoji">{{ currentLocaleOption().flag }}</span>
+            <el-icon size="11" class="chevron" :class="{ open: showLocaleMenu }">
               <ArrowRight />
             </el-icon>
           </button>
           <transition name="dropdown">
-            <div v-if="showThemeMenu" class="theme-menu">
-              <button
-                v-for="option in themeOptions"
-                :key="option.value"
-                class="theme-option"
-                :class="{ active: themeMode === option.value }"
-                @mousedown.prevent="selectTheme(option.value)"
-              >
-                <el-icon size="16"><component :is="option.icon" /></el-icon>
-                <span>{{ option.label }}</span>
-                <el-icon v-if="themeMode === option.value" size="14" class="check-icon">
-                  <CircleCheck />
-                </el-icon>
-              </button>
+            <div v-if="showLocaleMenu" class="dropdown-menu">
+              <div class="dropdown-inner">
+                <button
+                  v-for="option in localeOptions"
+                  :key="option.value"
+                  class="dropdown-option"
+                  :class="{ active: currentLocaleOption().value === option.value }"
+                  @mousedown.prevent="selectLocale(option.value)"
+                >
+                  <span v-if="currentLocaleOption().value === option.value" class="active-bar" />
+                  <span class="flag-emoji">{{ option.flag }}</span>
+                  <span class="option-label">{{ option.label }}</span>
+                  <el-icon v-if="currentLocaleOption().value === option.value" size="13" class="check-icon">
+                    <CircleCheck />
+                  </el-icon>
+                </button>
+              </div>
             </div>
           </transition>
         </div>
-        <a href="https://github.com/aweiDev1118/code_tools_web" target="_blank" class="action-btn">
-          <el-icon size="20"><Link /></el-icon>
+
+        <!-- Theme Dropdown -->
+        <div ref="themeDropdownRef" class="dropdown-wrapper">
+          <button class="action-btn dropdown-trigger" @click="showThemeMenu = !showThemeMenu; showLocaleMenu = false">
+            <el-icon size="17">
+              <component :is="currentThemeIcon()" />
+            </el-icon>
+            <el-icon size="11" class="chevron" :class="{ open: showThemeMenu }">
+              <ArrowRight />
+            </el-icon>
+          </button>
+          <transition name="dropdown">
+            <div v-if="showThemeMenu" class="dropdown-menu">
+              <div class="dropdown-inner">
+                <button
+                  v-for="option in themeOptions"
+                  :key="option.value"
+                  class="dropdown-option"
+                  :class="{ active: themeMode === option.value }"
+                  @mousedown.prevent="selectTheme(option.value)"
+                >
+                  <span v-if="themeMode === option.value" class="active-bar" />
+                  <el-icon size="15"><component :is="option.icon" /></el-icon>
+                  <span class="option-label">{{ t(option.labelKey) }}</span>
+                  <el-icon v-if="themeMode === option.value" size="13" class="check-icon">
+                    <CircleCheck />
+                  </el-icon>
+                </button>
+              </div>
+            </div>
+          </transition>
+        </div>
+
+        <!-- GitHub Link -->
+        <a
+          href="https://github.com/aweiDev1118/code_tools_web"
+          target="_blank"
+          class="action-btn github-btn"
+          title="GitHub"
+        >
+          <el-icon size="18"><Link /></el-icon>
         </a>
       </div>
     </div>
@@ -165,6 +255,9 @@ const hideResults = () => {
 </template>
 
 <style scoped>
+/* ========================================
+   Header Container — Subtle Glass
+   ======================================== */
 .header-container {
   position: fixed;
   top: 0;
@@ -172,14 +265,14 @@ const hideResults = () => {
   right: 0;
   height: 64px;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(250, 250, 250, 0.8);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
 }
 
 .dark .header-container {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(10, 11, 13, 0.85);
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
@@ -194,49 +287,71 @@ const hideResults = () => {
   gap: 24px;
 }
 
+/* ========================================
+   Left: Logo
+   ======================================== */
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .menu-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-  color: #6366f1;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  background: transparent;
+  color: #6b7280;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .menu-btn:hover {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-  transform: scale(1.05);
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.06);
+  color: #111827;
+}
+
+.dark .menu-btn {
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #8a8f98;
+}
+
+.dark .menu-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f7f8f8;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   text-decoration: none;
+  transition: transform 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.logo:hover {
+  transform: scale(1.03);
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.4);
   padding: 6px;
   box-sizing: border-box;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
 }
 
 .logo-img {
@@ -247,14 +362,25 @@ const hideResults = () => {
 }
 
 .logo-text {
-  font-size: 20px;
+  font-size: 15.5px;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  letter-spacing: -0.02em;
+  -webkit-font-smoothing: antialiased;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+.dark .logo-text {
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* ========================================
+   Center: Search
+   ======================================== */
 .header-center {
   flex: 1;
   max-width: 480px;
@@ -269,22 +395,25 @@ const hideResults = () => {
 
 .search-icon {
   position: absolute;
-  left: 16px;
+  left: 12px;
   color: #94a3b8;
   pointer-events: none;
+  transition: color 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 1;
 }
 
 .search-input {
   width: 100%;
-  height: 44px;
-  padding: 0 100px 0 44px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
-  color: #1e293b;
+  height: 38px;
+  padding: 0 76px 0 38px;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.03);
+  font-size: 13.5px;
+  color: #111827;
   outline: none;
-  transition: all 0.3s ease;
+  transition: all 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  -webkit-font-smoothing: antialiased;
 }
 
 .search-input::placeholder {
@@ -292,249 +421,389 @@ const hideResults = () => {
 }
 
 .search-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-  background: white;
+  border-color: rgba(99, 102, 241, 0.4);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
 }
 
 .dark .search-input {
-  background: rgba(30, 41, 59, 0.8);
-  border-color: #334155;
-  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f7f8f8;
+}
+
+.dark .search-input::placeholder {
+  color: #4b5563;
 }
 
 .dark .search-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-  background: #1e293b;
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .search-kbd {
   position: absolute;
-  right: 12px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  font-size: 12px;
-  color: #64748b;
+  right: 10px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  font-size: 10.5px;
+  color: #94a3b8;
   font-family: inherit;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  pointer-events: none;
 }
 
 .dark .search-kbd {
-  background: #334155;
-  border-color: #475569;
-  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #4b5563;
 }
 
+/* Search Results */
 .search-results {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 0 0 0.5px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   z-index: 50;
 }
 
 .dark .search-results {
-  background: #1e293b;
-  border-color: #334155;
+  background: rgba(18, 18, 20, 0.95);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 0 0 0.5px rgba(255, 255, 255, 0.06);
+}
+
+.search-results-inner {
+  padding: 6px;
 }
 
 .search-result-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 10px;
+  padding: 9px 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  transition: all 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .search-result-item:hover {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.dark .search-result-item:hover {
+  background: rgba(99, 102, 241, 0.1);
 }
 
 .result-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.08);
+  border: 0.5px solid rgba(99, 102, 241, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #6366f1;
+  flex-shrink: 0;
+}
+
+.dark .result-icon {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
 }
 
 .result-info {
   flex: 1;
+  min-width: 0;
 }
 
 .result-name {
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 2px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 1px;
+  -webkit-font-smoothing: antialiased;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dark .result-name {
-  color: #f1f5f9;
+  color: #f7f8f8;
 }
 
 .result-desc {
-  font-size: 13px;
-  color: #64748b;
+  font-size: 11.5px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dark .result-desc {
-  color: #94a3b8;
+  color: #6b7280;
+}
+
+.result-arrow {
+  color: #cbd5e1;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.search-result-item:hover .result-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: #6366f1;
+}
+
+.dark .search-result-item:hover .result-arrow {
+  color: #818cf8;
 }
 
 .search-empty {
   padding: 32px;
   text-align: center;
   color: #94a3b8;
+  font-size: 13px;
 }
 
+.empty-icon {
+  color: #d1d5db;
+  margin-bottom: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dark .empty-icon {
+  color: #374151;
+}
+
+/* ========================================
+   Right: Actions
+   ======================================== */
 .header-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .action-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #64748b;
+  height: 36px;
+  border-radius: 8px;
+  border: 0.5px solid transparent;
+  background: transparent;
+  color: #6b7280;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-decoration: none;
+  padding: 0 10px;
+  gap: 4px;
 }
 
 .action-btn:hover {
-  border-color: #6366f1;
-  color: #6366f1;
-  transform: scale(1.05);
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.06);
+  color: #111827;
 }
 
 .dark .action-btn {
-  background: #1e293b;
-  border-color: #334155;
-  color: #94a3b8;
+  color: #8a8f98;
 }
 
 .dark .action-btn:hover {
-  border-color: #6366f1;
-  color: #a5b4fc;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f7f8f8;
 }
 
-/* Theme Dropdown */
-.theme-dropdown {
+.github-btn:hover {
+  color: #6366f1;
+}
+
+.dark .github-btn:hover {
+  color: #818cf8;
+}
+
+/* ========================================
+   Dropdowns (shared: theme + locale)
+   ======================================== */
+.dropdown-wrapper {
   position: relative;
   outline: none;
 }
 
-.theme-trigger {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  width: auto;
-  padding: 0 10px;
+.dropdown-trigger {
+  min-width: 36px;
+}
+
+.flag-emoji {
+  font-size: 15px;
+  line-height: 1;
 }
 
 .chevron {
-  transition: transform 0.2s ease;
+  transition: transform 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   transform: rotate(90deg);
+  color: #9ca3af;
 }
 
 .chevron.open {
   transform: rotate(-90deg);
+  color: #6366f1;
 }
 
-.theme-menu {
+.dark .chevron.open {
+  color: #818cf8;
+}
+
+.dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  min-width: 140px;
-  background: white;
+  min-width: 160px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
   border-radius: 12px;
-  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e2e8f0;
-  padding: 6px;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 0 0 0.5px rgba(0, 0, 0, 0.06);
   z-index: 200;
+  overflow: hidden;
 }
 
-.dark .theme-menu {
-  background: #1e293b;
-  border-color: #334155;
-  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.4);
+.dark .dropdown-menu {
+  background: rgba(18, 18, 20, 0.95);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 0 0 0.5px rgba(255, 255, 255, 0.06);
 }
 
-.theme-option {
+.dropdown-inner {
+  padding: 6px;
+}
+
+.dropdown-option {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #475569;
-  font-size: 14px;
+  color: #374151;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
 }
 
-.theme-option:hover {
-  background: rgba(99, 102, 241, 0.08);
-  color: #6366f1;
+.dropdown-option:hover {
+  background: rgba(99, 102, 241, 0.06);
+  color: #111827;
 }
 
-.theme-option.active {
+.dropdown-option.active {
   color: #6366f1;
   font-weight: 500;
+  background: rgba(99, 102, 241, 0.06);
 }
 
-.dark .theme-option {
-  color: #94a3b8;
+.dark .dropdown-option {
+  color: #9ca3af;
 }
 
-.dark .theme-option:hover {
-  background: rgba(99, 102, 241, 0.15);
-  color: #a5b4fc;
+.dark .dropdown-option:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: #f7f8f8;
 }
 
-.dark .theme-option.active {
-  color: #a5b4fc;
+.dark .dropdown-option.active {
+  color: #818cf8;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* Solid left accent border for active item */
+.active-bar {
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 2px;
+  border-radius: 1px;
+  background: #6366f1;
+}
+
+.option-label {
+  flex: 1;
+  text-align: left;
 }
 
 .check-icon {
   margin-left: auto;
   color: #6366f1;
+  flex-shrink: 0;
 }
 
 .dark .check-icon {
-  color: #a5b4fc;
+  color: #818cf8;
 }
 
-/* Dropdown Transition */
-.dropdown-enter-active,
+/* ========================================
+   Transitions
+   ======================================== */
+.search-drop-enter-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.search-drop-leave-active {
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+
+.search-drop-enter-from,
+.search-drop-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+}
+
+.dropdown-enter-active {
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .dropdown-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.14s ease, transform 0.14s ease;
 }
 
 .dropdown-enter-from,
 .dropdown-leave-to {
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(-6px) scale(0.96);
 }
 
 /* ========================================
@@ -563,15 +832,15 @@ const hideResults = () => {
   }
 
   .logo-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
   }
 
   .menu-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
   }
 
   .header-center {
@@ -584,14 +853,14 @@ const hideResults = () => {
   }
 
   .search-input {
-    height: 44px;
-    padding: 0 12px 0 40px;
+    height: 40px;
+    padding: 0 12px 0 36px;
     font-size: 16px; /* 防止 iOS 自动缩放 */
-    border-radius: 10px;
+    border-radius: 8px;
   }
 
   .search-icon {
-    left: 12px;
+    left: 10px;
   }
 
   .search-kbd {
@@ -603,9 +872,9 @@ const hideResults = () => {
   }
 
   .action-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
+    height: 40px;
+    border-radius: 8px;
+    padding: 0 8px;
   }
 
   .search-results {
@@ -615,29 +884,29 @@ const hideResults = () => {
     right: 12px;
     max-height: 60vh;
     overflow-y: auto;
-    border-radius: 14px;
-  }
-
-  .search-result-item {
-    padding: 14px 16px;
-  }
-
-  .result-icon {
-    width: 44px;
-    height: 44px;
     border-radius: 12px;
   }
 
+  .search-result-item {
+    padding: 10px 10px;
+  }
+
+  .result-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
   .result-name {
-    font-size: 15px;
+    font-size: 13.5px;
   }
 
   .result-desc {
-    font-size: 13px;
+    font-size: 11.5px;
   }
 
   .search-empty {
-    padding: 40px 20px;
+    padding: 32px 20px;
   }
 }
 
@@ -649,17 +918,16 @@ const hideResults = () => {
 
   .menu-btn,
   .action-btn {
-    width: 40px;
-    height: 40px;
+    height: 38px;
   }
 
   .logo-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
   .search-input {
-    height: 40px;
+    height: 38px;
     font-size: 15px;
   }
 }
@@ -671,7 +939,7 @@ const hideResults = () => {
   }
 
   .search-input {
-    height: 46px;
+    height: 42px;
   }
 }
 
@@ -686,14 +954,18 @@ const hideResults = () => {
   }
 
   .menu-btn,
-  .action-btn,
+  .action-btn {
+    height: 34px;
+  }
+
   .logo-icon {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
   }
 
   .search-input {
-    height: 38px;
+    height: 36px;
   }
 
   .search-results {

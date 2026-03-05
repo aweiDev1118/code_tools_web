@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs'
+
+const { t } = useI18n()
 
 const date1 = ref(dayjs().format('YYYY-MM-DD'))
 const date2 = ref(dayjs().add(30, 'day').format('YYYY-MM-DD'))
@@ -42,7 +45,15 @@ const calculatedDate = computed(() => {
 
 const calculatedWeekday = computed(() => {
   if (!calculatedDate.value) return ''
-  const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+  const weekdays = [
+    t('tool.date-calculator.sunday'),
+    t('tool.date-calculator.monday'),
+    t('tool.date-calculator.tuesday'),
+    t('tool.date-calculator.wednesday'),
+    t('tool.date-calculator.thursday'),
+    t('tool.date-calculator.friday'),
+    t('tool.date-calculator.saturday'),
+  ]
   return weekdays[dayjs(calculatedDate.value).day()]
 })
 
@@ -59,39 +70,39 @@ const setToday = (field: 'date1' | 'date2' | 'baseDate') => {
   else baseDate.value = today
 }
 
-const units = [
-  { value: 'day', label: '天' },
-  { value: 'week', label: '周' },
-  { value: 'month', label: '月' },
-  { value: 'year', label: '年' },
-]
+const units = computed(() => [
+  { value: 'day', label: t('tool.date-calculator.day') },
+  { value: 'week', label: t('tool.date-calculator.week') },
+  { value: 'month', label: t('tool.date-calculator.month') },
+  { value: 'year', label: t('tool.date-calculator.year') },
+])
 </script>
 
 <template>
   <div class="max-w-4xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">日期计算</h1>
-      <p class="text-gray-500">计算日期差值或推算日期</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.date-calculator.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.date-calculator.subtitle') }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 日期差值计算 -->
       <el-card>
-        <template #header>日期差值计算</template>
+        <template #header>{{ t('tool.date-calculator.diffHeader') }}</template>
         <div class="space-y-4">
           <div class="flex items-center gap-2">
-            <span class="w-16">开始:</span>
+            <span class="w-16">{{ t('tool.date-calculator.start') }}:</span>
             <el-date-picker v-model="date1" type="date" value-format="YYYY-MM-DD" class="flex-1" />
-            <el-button size="small" @click="setToday('date1')">今天</el-button>
+            <el-button size="small" @click="setToday('date1')">{{ t('tool.date-calculator.today') }}</el-button>
           </div>
           <div class="flex items-center gap-2">
-            <span class="w-16">结束:</span>
+            <span class="w-16">{{ t('tool.date-calculator.end') }}:</span>
             <el-date-picker v-model="date2" type="date" value-format="YYYY-MM-DD" class="flex-1" />
-            <el-button size="small" @click="setToday('date2')">今天</el-button>
+            <el-button size="small" @click="setToday('date2')">{{ t('tool.date-calculator.today') }}</el-button>
           </div>
           <el-button @click="swapDates" class="w-full">
             <el-icon><Switch /></el-icon>
-            交换日期
+            {{ t('tool.date-calculator.swapDates') }}
           </el-button>
 
           <el-divider />
@@ -99,25 +110,25 @@ const units = [
           <div v-if="diff" class="space-y-3">
             <div class="text-center p-4 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
               <div class="text-3xl font-bold text-primary-600">{{ diff.days }}</div>
-              <div class="text-gray-500">天</div>
+              <div class="text-gray-500">{{ t('tool.date-calculator.days') }}</div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded text-center">
-                <div class="text-lg font-semibold">{{ diff.weeks }} 周 {{ diff.remainingDays }} 天</div>
-                <div class="text-sm text-gray-500">周数</div>
+                <div class="text-lg font-semibold">{{ diff.weeks }} {{ t('tool.date-calculator.week') }} {{ diff.remainingDays }} {{ t('tool.date-calculator.days') }}</div>
+                <div class="text-sm text-gray-500">{{ t('tool.date-calculator.weeks') }}</div>
               </div>
               <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded text-center">
                 <div class="text-lg font-semibold">{{ diff.months }}</div>
-                <div class="text-sm text-gray-500">月</div>
+                <div class="text-sm text-gray-500">{{ t('tool.date-calculator.months') }}</div>
               </div>
               <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded text-center">
                 <div class="text-lg font-semibold">{{ diff.hours.toLocaleString() }}</div>
-                <div class="text-sm text-gray-500">小时</div>
+                <div class="text-sm text-gray-500">{{ t('tool.date-calculator.hours') }}</div>
               </div>
               <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded text-center">
                 <div class="text-lg font-semibold">{{ diff.minutes.toLocaleString() }}</div>
-                <div class="text-sm text-gray-500">分钟</div>
+                <div class="text-sm text-gray-500">{{ t('tool.date-calculator.minutes') }}</div>
               </div>
             </div>
           </div>
@@ -126,16 +137,16 @@ const units = [
 
       <!-- 日期推算 -->
       <el-card>
-        <template #header>日期推算</template>
+        <template #header>{{ t('tool.date-calculator.calcHeader') }}</template>
         <div class="space-y-4">
           <div class="flex items-center gap-2">
-            <span class="w-16">基准:</span>
+            <span class="w-16">{{ t('tool.date-calculator.base') }}:</span>
             <el-date-picker v-model="baseDate" type="date" value-format="YYYY-MM-DD" class="flex-1" />
-            <el-button size="small" @click="setToday('baseDate')">今天</el-button>
+            <el-button size="small" @click="setToday('baseDate')">{{ t('tool.date-calculator.today') }}</el-button>
           </div>
 
           <div class="flex items-center gap-2">
-            <span class="w-16">增减:</span>
+            <span class="w-16">{{ t('tool.date-calculator.offset') }}:</span>
             <el-input-number v-model="addValue" :min="-9999" :max="9999" class="flex-1" />
             <el-select v-model="addUnit" style="width: 80px">
               <el-option v-for="unit in units" :key="unit.value" :value="unit.value" :label="unit.label" />
@@ -145,14 +156,14 @@ const units = [
           <el-divider />
 
           <div class="text-center p-6 bg-green-50 dark:bg-green-900/30 rounded-lg">
-            <div class="text-sm text-gray-500 mb-2">计算结果</div>
+            <div class="text-sm text-gray-500 mb-2">{{ t('tool.date-calculator.calcResult') }}</div>
             <div class="text-2xl font-bold text-green-600">{{ calculatedDate }}</div>
             <div class="text-gray-500 mt-1">{{ calculatedWeekday }}</div>
           </div>
 
           <el-alert type="info" :closable="false" class="mt-4">
-            <p>输入正数表示之后的日期</p>
-            <p>输入负数表示之前的日期</p>
+            <p>{{ t('tool.date-calculator.positiveHint') }}</p>
+            <p>{{ t('tool.date-calculator.negativeHint') }}</p>
           </el-alert>
         </div>
       </el-card>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 interface BrowserInfo {
   userAgent: string
@@ -32,7 +35,7 @@ const getBrowserName = (ua: string): string => {
   if (ua.includes('Chrome')) return 'Chrome'
   if (ua.includes('Safari')) return 'Safari'
   if (ua.includes('Opera') || ua.includes('OPR')) return 'Opera'
-  return '未知浏览器'
+  return t('tool.browser-info.unknownBrowser')
 }
 
 const getOSName = (ua: string): string => {
@@ -44,16 +47,16 @@ const getOSName = (ua: string): string => {
   if (ua.includes('Linux')) return 'Linux'
   if (ua.includes('Android')) return 'Android'
   if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS'
-  return '未知系统'
+  return t('tool.browser-info.unknownOS')
 }
 
 const getDeviceType = (): string => {
   const ua = navigator.userAgent
   if (/Mobile|Android|iPhone|iPad|iPod/i.test(ua)) {
-    if (/iPad|Tablet/i.test(ua)) return '平板电脑'
-    return '手机'
+    if (/iPad|Tablet/i.test(ua)) return t('tool.browser-info.tablet')
+    return t('tool.browser-info.phone')
   }
-  return '电脑'
+  return t('tool.browser-info.desktop')
 }
 
 const fetchBrowserInfo = () => {
@@ -82,20 +85,20 @@ const fetchBrowserInfo = () => {
 
 const copyAllInfo = () => {
   if (!browserInfo.value) return
-  const info = `浏览器: ${getBrowserName(browserInfo.value.userAgent)}
-操作系统: ${getOSName(browserInfo.value.userAgent)}
-设备类型: ${getDeviceType()}
+  const info = `${t('tool.browser-info.browser')}: ${getBrowserName(browserInfo.value.userAgent)}
+${t('tool.browser-info.os')}: ${getOSName(browserInfo.value.userAgent)}
+${t('tool.browser-info.deviceType')}: ${getDeviceType()}
 UserAgent: ${browserInfo.value.userAgent}
-平台: ${browserInfo.value.platform}
-语言: ${browserInfo.value.language}
-屏幕分辨率: ${browserInfo.value.screenWidth} x ${browserInfo.value.screenHeight}
-窗口大小: ${browserInfo.value.windowWidth} x ${browserInfo.value.windowHeight}
-像素比: ${browserInfo.value.pixelRatio}
-时区: ${browserInfo.value.timezone}
-CPU 核心数: ${browserInfo.value.hardwareConcurrency}
-触控点数: ${browserInfo.value.maxTouchPoints}
-Cookie 启用: ${browserInfo.value.cookieEnabled ? '是' : '否'}
-在线状态: ${browserInfo.value.onLine ? '在线' : '离线'}`
+${t('tool.browser-info.platform')}: ${browserInfo.value.platform}
+${t('tool.browser-info.language')}: ${browserInfo.value.language}
+${t('tool.browser-info.screenResolution')}: ${browserInfo.value.screenWidth} x ${browserInfo.value.screenHeight}
+${t('tool.browser-info.windowSize')}: ${browserInfo.value.windowWidth} x ${browserInfo.value.windowHeight}
+${t('tool.browser-info.pixelRatio')}: ${browserInfo.value.pixelRatio}
+${t('tool.browser-info.timezone')}: ${browserInfo.value.timezone}
+${t('tool.browser-info.cpuCores')}: ${browserInfo.value.hardwareConcurrency}
+${t('tool.browser-info.touchPoints')}: ${browserInfo.value.maxTouchPoints}
+Cookie: ${browserInfo.value.cookieEnabled ? t('tool.browser-info.enabled') : t('tool.browser-info.disabled')}
+${t('tool.browser-info.onlineStatus')}: ${browserInfo.value.onLine ? t('tool.browser-info.online') : t('tool.browser-info.offline')}`
   copyToClipboard(info)
 }
 
@@ -107,18 +110,18 @@ onMounted(() => {
 <template>
   <div class="max-w-4xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">浏览器信息</h1>
-      <p class="text-gray-500">获取您的浏览器和设备详细信息</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.browser-info.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.browser-info.subtitle') }}</p>
     </div>
 
     <div class="mb-4">
       <el-button type="primary" @click="copyAllInfo">
         <el-icon class="mr-1"><CopyDocument /></el-icon>
-        复制全部信息
+        {{ t('tool.browser-info.copyAllInfo') }}
       </el-button>
       <el-button @click="fetchBrowserInfo">
         <el-icon class="mr-1"><Refresh /></el-icon>
-        刷新
+        {{ t('tool.browser-info.refresh') }}
       </el-button>
     </div>
 
@@ -142,39 +145,39 @@ onMounted(() => {
           <template #header>
             <div class="card-header">
               <el-icon><ChromeFilled /></el-icon>
-              <span>浏览器信息</span>
+              <span>{{ t('tool.browser-info.browserInfo') }}</span>
             </div>
           </template>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">浏览器</span>
+              <span class="info-label">{{ t('tool.browser-info.browser') }}</span>
               <span class="info-value">{{ getBrowserName(browserInfo.userAgent) }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">浏览器引擎</span>
+              <span class="info-label">{{ t('tool.browser-info.engine') }}</span>
               <span class="info-value">{{ browserInfo.vendor || '-' }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">平台</span>
+              <span class="info-label">{{ t('tool.browser-info.platform') }}</span>
               <span class="info-value">{{ browserInfo.platform }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">语言</span>
+              <span class="info-label">{{ t('tool.browser-info.language') }}</span>
               <span class="info-value">{{ browserInfo.language }}</span>
             </div>
             <div class="info-item">
               <span class="info-label">Cookie</span>
               <span class="info-value">
                 <el-tag :type="browserInfo.cookieEnabled ? 'success' : 'danger'" size="small">
-                  {{ browserInfo.cookieEnabled ? '启用' : '禁用' }}
+                  {{ browserInfo.cookieEnabled ? t('tool.browser-info.enabled') : t('tool.browser-info.disabled') }}
                 </el-tag>
               </span>
             </div>
             <div class="info-item">
-              <span class="info-label">在线状态</span>
+              <span class="info-label">{{ t('tool.browser-info.onlineStatus') }}</span>
               <span class="info-value">
                 <el-tag :type="browserInfo.onLine ? 'success' : 'danger'" size="small">
-                  {{ browserInfo.onLine ? '在线' : '离线' }}
+                  {{ browserInfo.onLine ? t('tool.browser-info.online') : t('tool.browser-info.offline') }}
                 </el-tag>
               </span>
             </div>
@@ -186,28 +189,28 @@ onMounted(() => {
           <template #header>
             <div class="card-header">
               <el-icon><Monitor /></el-icon>
-              <span>屏幕信息</span>
+              <span>{{ t('tool.browser-info.screenInfo') }}</span>
             </div>
           </template>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">屏幕分辨率</span>
+              <span class="info-label">{{ t('tool.browser-info.screenResolution') }}</span>
               <span class="info-value">{{ browserInfo.screenWidth }} x {{ browserInfo.screenHeight }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">窗口大小</span>
+              <span class="info-label">{{ t('tool.browser-info.windowSize') }}</span>
               <span class="info-value">{{ browserInfo.windowWidth }} x {{ browserInfo.windowHeight }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">像素比</span>
+              <span class="info-label">{{ t('tool.browser-info.pixelRatio') }}</span>
               <span class="info-value">{{ browserInfo.pixelRatio }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">色深</span>
+              <span class="info-label">{{ t('tool.browser-info.colorDepth') }}</span>
               <span class="info-value">{{ browserInfo.screenColorDepth }} bit</span>
             </div>
             <div class="info-item">
-              <span class="info-label">触控点数</span>
+              <span class="info-label">{{ t('tool.browser-info.touchPoints') }}</span>
               <span class="info-value">{{ browserInfo.maxTouchPoints }}</span>
             </div>
           </div>
@@ -218,28 +221,28 @@ onMounted(() => {
           <template #header>
             <div class="card-header">
               <el-icon><Cpu /></el-icon>
-              <span>系统信息</span>
+              <span>{{ t('tool.browser-info.systemInfo') }}</span>
             </div>
           </template>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">操作系统</span>
+              <span class="info-label">{{ t('tool.browser-info.os') }}</span>
               <span class="info-value">{{ getOSName(browserInfo.userAgent) }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">设备类型</span>
+              <span class="info-label">{{ t('tool.browser-info.deviceType') }}</span>
               <span class="info-value">{{ getDeviceType() }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">CPU 核心数</span>
+              <span class="info-label">{{ t('tool.browser-info.cpuCores') }}</span>
               <span class="info-value">{{ browserInfo.hardwareConcurrency }}</span>
             </div>
             <div class="info-item" v-if="browserInfo.deviceMemory">
-              <span class="info-label">设备内存</span>
+              <span class="info-label">{{ t('tool.browser-info.deviceMemory') }}</span>
               <span class="info-value">{{ browserInfo.deviceMemory }} GB</span>
             </div>
             <div class="info-item">
-              <span class="info-label">时区</span>
+              <span class="info-label">{{ t('tool.browser-info.timezone') }}</span>
               <span class="info-value">{{ browserInfo.timezone }}</span>
             </div>
           </div>
@@ -257,7 +260,7 @@ onMounted(() => {
             <code class="ua-text">{{ browserInfo.userAgent }}</code>
             <el-button size="small" class="mt-3" @click="copyToClipboard(browserInfo.userAgent)">
               <el-icon class="mr-1"><CopyDocument /></el-icon>
-              复制
+              {{ t('common.copy') }}
             </el-button>
           </div>
         </el-card>

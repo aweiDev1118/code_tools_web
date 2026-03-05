@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const pattern = ref('')
 const flags = ref(['g'])
 const testString = ref('')
 
-const flagOptions = [
-  { value: 'g', label: 'g (全局匹配)' },
-  { value: 'i', label: 'i (忽略大小写)' },
-  { value: 'm', label: 'm (多行模式)' },
-  { value: 's', label: 's (dotAll)' },
-]
+const flagOptions = computed(() => [
+  { value: 'g', label: t('tool.regex-tester.flagG') },
+  { value: 'i', label: t('tool.regex-tester.flagI') },
+  { value: 'm', label: t('tool.regex-tester.flagM') },
+  { value: 's', label: t('tool.regex-tester.flagS') },
+])
 
 const result = computed(() => {
   if (!pattern.value || !testString.value) {
@@ -74,21 +77,21 @@ test.user@domain.co.uk`
 <template>
   <div class="max-w-5xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">正则表达式测试</h1>
-      <p class="text-gray-500">在线测试正则表达式匹配</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.regex-tester.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.regex-tester.subtitle') }}</p>
     </div>
 
     <div class="mb-4">
-      <el-button @click="loadSample" text>加载邮箱匹配示例</el-button>
+      <el-button @click="loadSample" text>{{ t('tool.regex-tester.loadEmailSample') }}</el-button>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div class="space-y-4">
         <el-card>
-          <template #header>正则表达式</template>
+          <template #header>{{ t('tool.regex-tester.regexHeader') }}</template>
           <el-input
             v-model="pattern"
-            placeholder="输入正则表达式，如: \d+"
+            :placeholder="t('tool.regex-tester.regexPlaceholder')"
             class="font-mono"
           >
             <template #prepend>/</template>
@@ -111,12 +114,12 @@ test.user@domain.co.uk`
         </el-card>
 
         <el-card>
-          <template #header>测试文本</template>
+          <template #header>{{ t('tool.regex-tester.testTextHeader') }}</template>
           <el-input
             v-model="testString"
             type="textarea"
             :rows="8"
-            placeholder="输入要测试的文本..."
+            :placeholder="t('tool.regex-tester.testTextPlaceholder')"
           />
         </el-card>
       </div>
@@ -125,9 +128,9 @@ test.user@domain.co.uk`
         <el-card>
           <template #header>
             <div class="flex justify-between">
-              <span>匹配结果</span>
+              <span>{{ t('tool.regex-tester.matchResult') }}</span>
               <el-tag v-if="result.matches.length > 0" type="success">
-                {{ result.matches.length }} 个匹配
+                {{ result.matches.length }} {{ t('tool.regex-tester.matchCount') }}
               </el-tag>
             </div>
           </template>
@@ -136,11 +139,11 @@ test.user@domain.co.uk`
             class="p-4 bg-gray-50 dark:bg-gray-700 rounded font-mono text-sm whitespace-pre-wrap"
             v-html="highlightedText"
           />
-          <el-empty v-else description="输入测试文本" />
+          <el-empty v-else :description="t('tool.regex-tester.emptyHint')" />
         </el-card>
 
         <el-card v-if="result.matches.length > 0">
-          <template #header>匹配详情</template>
+          <template #header>{{ t('tool.regex-tester.matchDetails') }}</template>
           <div class="space-y-2 max-h-60 overflow-auto">
             <div
               v-for="(m, index) in result.matches"
@@ -149,7 +152,7 @@ test.user@domain.co.uk`
             >
               <div class="flex justify-between">
                 <span class="font-mono text-primary-600">{{ m.match }}</span>
-                <span class="text-gray-500">位置: {{ m.index }}</span>
+                <span class="text-gray-500">{{ t('tool.regex-tester.position') }}: {{ m.index }}</span>
               </div>
             </div>
           </div>
