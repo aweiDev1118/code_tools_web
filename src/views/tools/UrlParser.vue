@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const urlInput = ref('https://example.com:8080/path/to/page?name=test&id=123#section')
 
@@ -70,16 +73,16 @@ const clear = () => {
 <template>
   <div class="max-w-4xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">URL 解析</h1>
-      <p class="text-gray-500">解析 URL 地址的各个组成部分</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.url-parser.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.url-parser.subtitle') }}</p>
     </div>
 
     <!-- 输入区 -->
     <el-card class="mb-4">
-      <template #header>输入 URL</template>
+      <template #header>{{ t('tool.url-parser.inputUrl') }}</template>
       <el-input
         v-model="urlInput"
-        placeholder="请输入要解析的 URL..."
+        :placeholder="t('tool.url-parser.inputPlaceholder')"
         size="large"
         clearable
       >
@@ -88,11 +91,11 @@ const clear = () => {
         </template>
       </el-input>
       <div class="mt-3 flex gap-2">
-        <el-button @click="loadSample">加载示例</el-button>
-        <el-button @click="clear">清空</el-button>
+        <el-button @click="loadSample">{{ t('common.loadSample') }}</el-button>
+        <el-button @click="clear">{{ t('common.clear') }}</el-button>
       </div>
       <div v-if="!isValidUrl" class="mt-2 text-red-500 text-sm">
-        URL 格式不正确
+        {{ t('tool.url-parser.invalidUrl') }}
       </div>
     </el-card>
 
@@ -104,12 +107,12 @@ const clear = () => {
           <template #header>
             <div class="card-header">
               <el-icon><Link /></el-icon>
-              <span>基本信息</span>
+              <span>{{ t('tool.url-parser.basicInfo') }}</span>
             </div>
           </template>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">协议 (Protocol)</span>
+              <span class="info-label">{{ t('tool.url-parser.protocol') }}</span>
               <div class="info-value-wrap">
                 <code class="info-code">{{ parsedUrl.protocol }}</code>
                 <el-button size="small" text @click="copyPart(parsedUrl.protocol)">
@@ -118,7 +121,7 @@ const clear = () => {
               </div>
             </div>
             <div class="info-item">
-              <span class="info-label">主机名 (Hostname)</span>
+              <span class="info-label">{{ t('tool.url-parser.hostname') }}</span>
               <div class="info-value-wrap">
                 <code class="info-code">{{ parsedUrl.hostname }}</code>
                 <el-button size="small" text @click="copyPart(parsedUrl.hostname)">
@@ -127,9 +130,9 @@ const clear = () => {
               </div>
             </div>
             <div class="info-item">
-              <span class="info-label">端口 (Port)</span>
+              <span class="info-label">{{ t('tool.url-parser.port') }}</span>
               <div class="info-value-wrap">
-                <code class="info-code">{{ parsedUrl.port || '默认' }}</code>
+                <code class="info-code">{{ parsedUrl.port || t('tool.url-parser.defaultPort') }}</code>
                 <el-button v-if="parsedUrl.port" size="small" text @click="copyPart(parsedUrl.port)">
                   <el-icon><CopyDocument /></el-icon>
                 </el-button>
@@ -152,12 +155,12 @@ const clear = () => {
           <template #header>
             <div class="card-header">
               <el-icon><FolderOpened /></el-icon>
-              <span>路径信息</span>
+              <span>{{ t('tool.url-parser.pathInfo') }}</span>
             </div>
           </template>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">路径 (Pathname)</span>
+              <span class="info-label">{{ t('tool.url-parser.pathname') }}</span>
               <div class="info-value-wrap">
                 <code class="info-code">{{ parsedUrl.pathname || '/' }}</code>
                 <el-button size="small" text @click="copyPart(parsedUrl.pathname)">
@@ -166,18 +169,18 @@ const clear = () => {
               </div>
             </div>
             <div class="info-item">
-              <span class="info-label">查询字符串 (Search)</span>
+              <span class="info-label">{{ t('tool.url-parser.search') }}</span>
               <div class="info-value-wrap">
-                <code class="info-code">{{ parsedUrl.search || '无' }}</code>
+                <code class="info-code">{{ parsedUrl.search || t('tool.url-parser.none') }}</code>
                 <el-button v-if="parsedUrl.search" size="small" text @click="copyPart(parsedUrl.search)">
                   <el-icon><CopyDocument /></el-icon>
                 </el-button>
               </div>
             </div>
             <div class="info-item">
-              <span class="info-label">锚点 (Hash)</span>
+              <span class="info-label">{{ t('tool.url-parser.hash') }}</span>
               <div class="info-value-wrap">
-                <code class="info-code">{{ parsedUrl.hash || '无' }}</code>
+                <code class="info-code">{{ parsedUrl.hash || t('tool.url-parser.none') }}</code>
                 <el-button v-if="parsedUrl.hash" size="small" text @click="copyPart(parsedUrl.hash)">
                   <el-icon><CopyDocument /></el-icon>
                 </el-button>
@@ -192,21 +195,21 @@ const clear = () => {
         <template #header>
           <div class="card-header">
             <el-icon><List /></el-icon>
-            <span>查询参数 ({{ parsedUrl.params.length }} 个)</span>
+            <span>{{ t('tool.url-parser.queryParams') }} ({{ parsedUrl.params.length }} {{ t('tool.url-parser.paramsCount') }})</span>
           </div>
         </template>
         <el-table :data="parsedUrl.params" stripe>
-          <el-table-column prop="key" label="参数名" min-width="120">
+          <el-table-column prop="key" :label="t('tool.url-parser.paramName')" min-width="120">
             <template #default="{ row }">
               <code class="param-code">{{ row.key }}</code>
             </template>
           </el-table-column>
-          <el-table-column prop="value" label="参数值" min-width="200">
+          <el-table-column prop="value" :label="t('tool.url-parser.paramValue')" min-width="200">
             <template #default="{ row }">
               <code class="param-code">{{ decodeURIComponent(row.value) }}</code>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="80" align="center">
+          <el-table-column :label="t('tool.url-parser.action')" width="80" align="center">
             <template #default="{ row }">
               <el-button size="small" text @click="copyPart(row.value)">
                 <el-icon><CopyDocument /></el-icon>
@@ -220,7 +223,7 @@ const clear = () => {
     <!-- 无结果提示 -->
     <el-card v-else-if="urlInput && !isValidUrl" class="text-center py-10">
       <el-icon :size="48" class="text-gray-300 mb-4"><Warning /></el-icon>
-      <p class="text-gray-500">请输入有效的 URL 地址</p>
+      <p class="text-gray-500">{{ t('tool.url-parser.enterValidUrl') }}</p>
     </el-card>
   </div>
 </template>

@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { copyToClipboard } from '@/utils/clipboard'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const input = ref('')
 const output = ref('')
@@ -14,9 +17,9 @@ const encode = () => {
     output.value = encodeType.value === 'component'
       ? encodeURIComponent(input.value)
       : encodeURI(input.value)
-    ElMessage.success('编码成功')
+    ElMessage.success(t('tool.url-encode.encodeSuccess'))
   } catch {
-    ElMessage.error('编码失败')
+    ElMessage.error(t('tool.url-encode.encodeFail'))
   }
 }
 
@@ -26,9 +29,9 @@ const decode = () => {
     output.value = encodeType.value === 'component'
       ? decodeURIComponent(input.value)
       : decodeURI(input.value)
-    ElMessage.success('解码成功')
+    ElMessage.success(t('tool.url-encode.decodeSuccess'))
   } catch {
-    ElMessage.error('解码失败，请检查输入')
+    ElMessage.error(t('tool.url-encode.decodeFail'))
   }
 }
 
@@ -65,55 +68,55 @@ const loadSample = () => {
 <template>
   <div class="max-w-6xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">URL 编解码</h1>
-      <p class="text-gray-500">URL 编码与解码转换</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.url-encode.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.url-encode.subtitle') }}</p>
     </div>
 
     <div class="mb-4 flex flex-wrap gap-2 items-center">
       <el-radio-group v-model="mode">
-        <el-radio-button value="encode">编码</el-radio-button>
-        <el-radio-button value="decode">解码</el-radio-button>
+        <el-radio-button value="encode">{{ t('common.encode') }}</el-radio-button>
+        <el-radio-button value="decode">{{ t('common.decode') }}</el-radio-button>
       </el-radio-group>
       <el-select v-model="encodeType" style="width: 180px">
         <el-option value="component" label="encodeURIComponent" />
         <el-option value="uri" label="encodeURI" />
       </el-select>
       <el-button type="primary" @click="convert">
-        {{ mode === 'encode' ? '编码' : '解码' }}
+        {{ mode === 'encode' ? t('common.encode') : t('common.decode') }}
       </el-button>
       <el-button @click="swap">
         <el-icon><Switch /></el-icon>
-        交换
+        {{ t('tool.url-encode.swap') }}
       </el-button>
-      <el-button @click="copy">复制结果</el-button>
-      <el-button @click="clear">清空</el-button>
-      <el-button @click="loadSample" text>示例</el-button>
+      <el-button @click="copy">{{ t('tool.url-encode.copyResult') }}</el-button>
+      <el-button @click="clear">{{ t('common.clear') }}</el-button>
+      <el-button @click="loadSample" text>{{ t('tool.url-encode.sample') }}</el-button>
     </div>
 
     <el-alert class="mb-4" type="info" :closable="false">
-      <strong>encodeURIComponent:</strong> 编码所有特殊字符，适用于 URL 参数<br>
-      <strong>encodeURI:</strong> 保留 URL 结构字符 (://?#)，适用于完整 URL
+      <strong>encodeURIComponent:</strong> {{ t('tool.url-encode.componentHint') }}<br>
+      <strong>encodeURI:</strong> {{ t('tool.url-encode.uriHint') }}
     </el-alert>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <el-card>
-        <template #header>输入</template>
+        <template #header>{{ t('common.input') }}</template>
         <el-input
           v-model="input"
           type="textarea"
           :rows="12"
-          placeholder="请输入要转换的内容..."
+          :placeholder="t('tool.url-encode.inputPlaceholder')"
         />
       </el-card>
 
       <el-card>
-        <template #header>输出</template>
+        <template #header>{{ t('common.output') }}</template>
         <el-input
           v-model="output"
           type="textarea"
           :rows="12"
           readonly
-          placeholder="转换结果..."
+          :placeholder="t('tool.url-encode.resultPlaceholder')"
         />
       </el-card>
     </div>

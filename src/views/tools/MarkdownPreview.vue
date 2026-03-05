@@ -30,6 +30,9 @@ hljs.registerLanguage('python', python)
 hljs.registerLanguage('java', java)
 hljs.registerLanguage('sql', sql)
 import { copyToClipboard } from '@/utils/clipboard'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const marked = new Marked(
   markedHighlight({
@@ -82,11 +85,11 @@ const output = computed(() => {
 })
 
 const copy = () => {
-  copyToClipboard(input.value, '已复制 Markdown 源码')
+  copyToClipboard(input.value, t('tool.markdown-preview.markdownCopied'))
 }
 
 const copyHtml = () => {
-  copyToClipboard(output.value, '已复制 HTML')
+  copyToClipboard(output.value, t('tool.markdown-preview.htmlCopied'))
 }
 
 const clear = () => {
@@ -97,30 +100,30 @@ const clear = () => {
 <template>
   <div class="max-w-7xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Markdown 预览</h1>
-      <p class="text-gray-500">实时预览 Markdown 渲染效果</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.markdown-preview.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.markdown-preview.subtitle') }}</p>
     </div>
 
     <div class="mb-4 flex gap-2">
-      <el-button @click="copy">复制 Markdown</el-button>
-      <el-button @click="copyHtml">复制 HTML</el-button>
-      <el-button @click="clear">清空</el-button>
+      <el-button @click="copy">{{ t('tool.markdown-preview.copyMarkdown') }}</el-button>
+      <el-button @click="copyHtml">{{ t('tool.markdown-preview.copyHtml') }}</el-button>
+      <el-button @click="clear">{{ t('common.clear') }}</el-button>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <el-card class="h-[600px]">
-        <template #header>编辑</template>
+        <template #header>{{ t('tool.markdown-preview.editor') }}</template>
         <el-input
           v-model="input"
           type="textarea"
           :rows="22"
-          placeholder="输入 Markdown..."
+          :placeholder="t('tool.markdown-preview.inputPlaceholder')"
           class="font-mono h-full"
         />
       </el-card>
 
       <el-card class="h-[600px] overflow-auto">
-        <template #header>预览</template>
+        <template #header>{{ t('tool.markdown-preview.preview') }}</template>
         <div
           class="prose prose-sm dark:prose-invert max-w-none"
           v-html="output"

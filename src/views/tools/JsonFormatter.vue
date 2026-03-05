@@ -2,6 +2,9 @@
 import { ref, computed, watch, h, defineComponent, PropType, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { copyToClipboard } from '@/utils/clipboard'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const input = ref('')
 const indentSize = ref(2)
@@ -159,10 +162,10 @@ const format = () => {
     const obj = JSON.parse(input.value)
     input.value = JSON.stringify(obj, null, indentSize.value)
     errorMsg.value = ''
-    ElMessage.success('格式化成功')
+    ElMessage.success(t('tool.json-formatter.formatSuccess'))
   } catch (e) {
     errorMsg.value = (e as Error).message
-    ElMessage.error('JSON 格式错误')
+    ElMessage.error(t('tool.json-formatter.jsonError'))
   }
 }
 
@@ -172,10 +175,10 @@ const compress = () => {
     const obj = JSON.parse(input.value)
     input.value = JSON.stringify(obj)
     errorMsg.value = ''
-    ElMessage.success('压缩成功')
+    ElMessage.success(t('tool.json-formatter.compressSuccess'))
   } catch (e) {
     errorMsg.value = (e as Error).message
-    ElMessage.error('JSON 格式错误')
+    ElMessage.error(t('tool.json-formatter.jsonError'))
   }
 }
 
@@ -384,22 +387,22 @@ const JsonNode = defineComponent({
 <template>
   <div class="max-w-6xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">JSON 格式化</h1>
-      <p class="text-gray-500">格式化、压缩、校验 JSON 数据，支持树形可视化</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.json-formatter.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.json-formatter.subtitle') }}</p>
     </div>
 
     <div class="mb-4 flex flex-wrap gap-2">
-      <el-button type="primary" @click="format">格式化</el-button>
-      <el-button @click="compress">压缩</el-button>
-      <el-button @click="copy">复制结果</el-button>
-      <el-button @click="clear">清空</el-button>
-      <el-button @click="loadSample" text>加载示例</el-button>
+      <el-button type="primary" @click="format">{{ t('common.format') }}</el-button>
+      <el-button @click="compress">{{ t('common.compress') }}</el-button>
+      <el-button @click="copy">{{ t('tool.json-formatter.copyResult') }}</el-button>
+      <el-button @click="clear">{{ t('common.clear') }}</el-button>
+      <el-button @click="loadSample" text>{{ t('common.loadSample') }}</el-button>
       <div class="ml-auto flex items-center gap-2">
-        <span class="text-sm text-gray-500">缩进:</span>
+        <span class="text-sm text-gray-500">{{ t('tool.json-formatter.indent') }}:</span>
         <el-select v-model="indentSize" style="width: 80px">
-          <el-option :value="2" label="2 空格" />
-          <el-option :value="4" label="4 空格" />
-          <el-option :value="1" label="Tab" />
+          <el-option :value="2" :label="t('tool.json-formatter.indent2')" />
+          <el-option :value="4" :label="t('tool.json-formatter.indent4')" />
+          <el-option :value="1" :label="t('tool.json-formatter.indentTab')" />
         </el-select>
       </div>
     </div>
@@ -409,16 +412,16 @@ const JsonNode = defineComponent({
       <el-card class="panel-card" :style="{ width: leftWidth + '%' }">
         <template #header>
           <div class="flex items-center justify-between">
-            <span>输入</span>
-            <el-tag v-if="errorMsg" type="danger" size="small">格式错误</el-tag>
-            <el-tag v-else-if="input.trim()" type="success" size="small">有效 JSON</el-tag>
+            <span>{{ t('common.input') }}</span>
+            <el-tag v-if="errorMsg" type="danger" size="small">{{ t('tool.json-formatter.formatError') }}</el-tag>
+            <el-tag v-else-if="input.trim()" type="success" size="small">{{ t('tool.json-formatter.validJson') }}</el-tag>
           </div>
         </template>
         <el-input
           v-model="input"
           type="textarea"
           :rows="20"
-          placeholder="请输入 JSON 数据..."
+          :placeholder="t('tool.json-formatter.inputPlaceholder')"
           class="font-mono"
         />
         <div v-if="errorMsg" class="mt-2 text-sm text-red-500">
@@ -434,15 +437,15 @@ const JsonNode = defineComponent({
       <el-card class="panel-card json-output-card" :style="{ width: (100 - leftWidth) + '%' }">
         <template #header>
           <div class="flex items-center justify-between flex-wrap gap-2">
-            <span>输出</span>
+            <span>{{ t('common.output') }}</span>
             <div class="flex items-center gap-2">
               <el-radio-group v-model="viewMode" size="small">
-                <el-radio-button value="tree">树形</el-radio-button>
-                <el-radio-button value="text">文本</el-radio-button>
+                <el-radio-button value="tree">{{ t('tool.json-formatter.treeView') }}</el-radio-button>
+                <el-radio-button value="text">{{ t('tool.json-formatter.textView') }}</el-radio-button>
               </el-radio-group>
               <template v-if="viewMode === 'tree' && parsedJson">
-                <el-button size="small" @click="expandAll">展开全部</el-button>
-                <el-button size="small" @click="collapseAll">折叠全部</el-button>
+                <el-button size="small" @click="expandAll">{{ t('tool.json-formatter.expandAll') }}</el-button>
+                <el-button size="small" @click="collapseAll">{{ t('tool.json-formatter.collapseAll') }}</el-button>
               </template>
             </div>
           </div>
@@ -455,14 +458,14 @@ const JsonNode = defineComponent({
           type="textarea"
           :rows="20"
           readonly
-          placeholder="格式化结果将显示在这里..."
+          :placeholder="t('tool.json-formatter.outputPlaceholder')"
           class="font-mono"
         />
 
         <!-- 树形视图 -->
         <div v-else class="json-tree-container">
           <div v-if="!parsedJson && !errorMsg" class="text-gray-400 text-center py-10">
-            格式化结果将显示在这里...
+            {{ t('tool.json-formatter.outputPlaceholder') }}
           </div>
           <div v-else-if="parsedJson" class="json-tree">
             <JsonNode

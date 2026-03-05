@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { copyToClipboard } from '@/utils/clipboard'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const input = ref('')
 const output = ref('')
@@ -39,7 +42,7 @@ const encode = () => {
     }
   }
   output.value = result
-  ElMessage.success('编码成功')
+  ElMessage.success(t('tool.html-entity.encodeSuccess'))
 }
 
 const decode = () => {
@@ -53,7 +56,7 @@ const decode = () => {
   result = result.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(parseInt(dec)))
   result = result.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
   output.value = result
-  ElMessage.success('解码成功')
+  ElMessage.success(t('tool.html-entity.decodeSuccess'))
 }
 
 const convert = () => {
@@ -93,56 +96,56 @@ const loadSample = () => {
 <template>
   <div class="max-w-6xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">HTML 实体转换</h1>
-      <p class="text-gray-500">HTML 实体编码与解码</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.html-entity.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.html-entity.subtitle') }}</p>
     </div>
 
     <div class="mb-4 flex flex-wrap gap-2 items-center">
       <el-radio-group v-model="mode">
-        <el-radio-button value="encode">编码</el-radio-button>
-        <el-radio-button value="decode">解码</el-radio-button>
+        <el-radio-button value="encode">{{ t('common.encode') }}</el-radio-button>
+        <el-radio-button value="decode">{{ t('common.decode') }}</el-radio-button>
       </el-radio-group>
-      <el-button type="primary" @click="convert">转换</el-button>
+      <el-button type="primary" @click="convert">{{ t('common.convert') }}</el-button>
       <el-button @click="swap">
         <el-icon><Switch /></el-icon>
-        交换
+        {{ t('tool.html-entity.swap') }}
       </el-button>
-      <el-button @click="copy">复制结果</el-button>
-      <el-button @click="clear">清空</el-button>
-      <el-button @click="loadSample" text>示例</el-button>
+      <el-button @click="copy">{{ t('tool.html-entity.copyResult') }}</el-button>
+      <el-button @click="clear">{{ t('common.clear') }}</el-button>
+      <el-button @click="loadSample" text>{{ t('tool.html-entity.sample') }}</el-button>
     </div>
 
     <el-alert class="mb-4" type="info" :closable="false">
       <div class="text-sm">
-        常用实体:
+        {{ t('tool.html-entity.commonEntities') }}:
         <code class="mx-1">&amp;lt;</code> = &lt;
         <code class="mx-1">&amp;gt;</code> = &gt;
         <code class="mx-1">&amp;amp;</code> = &amp;
         <code class="mx-1">&amp;quot;</code> = "
-        <code class="mx-1">&amp;nbsp;</code> = 空格
+        <code class="mx-1">&amp;nbsp;</code> = {{ t('tool.html-entity.space') }}
       </div>
     </el-alert>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <el-card>
-        <template #header>输入</template>
+        <template #header>{{ t('common.input') }}</template>
         <el-input
           v-model="input"
           type="textarea"
           :rows="12"
-          :placeholder="mode === 'encode' ? '请输入要编码的 HTML...' : '请输入要解码的实体...'"
+          :placeholder="mode === 'encode' ? t('tool.html-entity.encodePlaceholder') : t('tool.html-entity.decodePlaceholder')"
           class="font-mono"
         />
       </el-card>
 
       <el-card>
-        <template #header>输出</template>
+        <template #header>{{ t('common.output') }}</template>
         <el-input
           v-model="output"
           type="textarea"
           :rows="12"
           readonly
-          placeholder="转换结果..."
+          :placeholder="t('tool.html-entity.resultPlaceholder')"
           class="font-mono"
         />
       </el-card>

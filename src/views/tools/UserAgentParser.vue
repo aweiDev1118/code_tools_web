@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const uaInput = ref('')
 
@@ -17,23 +20,21 @@ interface ParsedUA {
 
 const parseUserAgent = (ua: string): ParsedUA => {
   const result: ParsedUA = {
-    browser: '未知',
+    browser: t('tool.useragent-parser.unknown'),
     browserVersion: '',
-    os: '未知',
+    os: t('tool.useragent-parser.unknown'),
     osVersion: '',
-    device: '电脑',
-    engine: '未知',
+    device: t('tool.useragent-parser.desktop'),
+    engine: t('tool.useragent-parser.unknown'),
     isMobile: false,
     isBot: false
   }
 
-  // 检测是否是爬虫
   if (/bot|spider|crawl|slurp|googlebot|bingbot|yandex/i.test(ua)) {
     result.isBot = true
-    result.device = '爬虫'
+    result.device = t('tool.useragent-parser.bot')
   }
 
-  // 检测浏览器
   if (ua.includes('Firefox/')) {
     result.browser = 'Firefox'
     result.browserVersion = ua.match(/Firefox\/([\d.]+)/)?.[1] || ''
@@ -60,7 +61,6 @@ const parseUserAgent = (ua: string): ParsedUA => {
     result.engine = 'Trident'
   }
 
-  // 检测操作系统
   if (ua.includes('Windows NT 10')) {
     result.os = 'Windows'
     result.osVersion = '10/11'
@@ -88,12 +88,11 @@ const parseUserAgent = (ua: string): ParsedUA => {
     result.os = 'Linux'
   }
 
-  // 检测设备类型
   if (/Mobile|Android|iPhone|iPod/i.test(ua)) {
-    result.device = '手机'
+    result.device = t('tool.useragent-parser.phone')
     result.isMobile = true
   } else if (/iPad|Tablet/i.test(ua)) {
-    result.device = '平板'
+    result.device = t('tool.useragent-parser.tablet')
     result.isMobile = true
   }
 
@@ -134,30 +133,30 @@ onMounted(() => {
 <template>
   <div class="max-w-4xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">UserAgent 分析</h1>
-      <p class="text-gray-500">解析 UserAgent 字符串，识别浏览器、操作系统等信息</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.useragent-parser.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.useragent-parser.subtitle') }}</p>
     </div>
 
     <!-- 输入区 -->
     <el-card class="mb-4">
-      <template #header>输入 UserAgent</template>
+      <template #header>{{ t('tool.useragent-parser.inputUA') }}</template>
       <el-input
         v-model="uaInput"
         type="textarea"
         :rows="3"
-        placeholder="请输入 UserAgent 字符串..."
+        :placeholder="t('tool.useragent-parser.inputPlaceholder')"
         class="font-mono text-sm"
       />
       <div class="mt-3 flex flex-wrap gap-2">
-        <el-button type="primary" @click="useCurrentUA">使用当前浏览器</el-button>
-        <el-button @click="clear">清空</el-button>
-        <el-button @click="copyToClipboard(uaInput)" :disabled="!uaInput">复制</el-button>
+        <el-button type="primary" @click="useCurrentUA">{{ t('tool.useragent-parser.useCurrentBrowser') }}</el-button>
+        <el-button @click="clear">{{ t('common.clear') }}</el-button>
+        <el-button @click="copyToClipboard(uaInput)" :disabled="!uaInput">{{ t('common.copy') }}</el-button>
       </div>
     </el-card>
 
     <!-- 示例 UA -->
     <el-card class="mb-4">
-      <template #header>常用 UserAgent 示例</template>
+      <template #header>{{ t('tool.useragent-parser.sampleUAs') }}</template>
       <div class="sample-list">
         <el-tag
           v-for="sample in sampleUAs"
@@ -190,8 +189,8 @@ onMounted(() => {
             </div>
           </div>
           <div class="result-tags">
-            <el-tag v-if="parsedResult.isMobile" type="info" size="small">移动设备</el-tag>
-            <el-tag v-if="parsedResult.isBot" type="warning" size="small">爬虫</el-tag>
+            <el-tag v-if="parsedResult.isMobile" type="info" size="small">{{ t('tool.useragent-parser.mobileDevice') }}</el-tag>
+            <el-tag v-if="parsedResult.isBot" type="warning" size="small">{{ t('tool.useragent-parser.bot') }}</el-tag>
           </div>
         </div>
       </el-card>
@@ -202,20 +201,20 @@ onMounted(() => {
           <template #header>
             <div class="card-header">
               <el-icon><ChromeFilled /></el-icon>
-              <span>浏览器信息</span>
+              <span>{{ t('tool.useragent-parser.browserInfo') }}</span>
             </div>
           </template>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">浏览器</span>
+              <span class="info-label">{{ t('tool.useragent-parser.browser') }}</span>
               <span class="info-value">{{ parsedResult.browser }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">版本</span>
+              <span class="info-label">{{ t('tool.useragent-parser.version') }}</span>
               <span class="info-value">{{ parsedResult.browserVersion || '-' }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">渲染引擎</span>
+              <span class="info-label">{{ t('tool.useragent-parser.renderEngine') }}</span>
               <span class="info-value">{{ parsedResult.engine }}</span>
             </div>
           </div>
@@ -225,20 +224,20 @@ onMounted(() => {
           <template #header>
             <div class="card-header">
               <el-icon><Platform /></el-icon>
-              <span>系统信息</span>
+              <span>{{ t('tool.useragent-parser.systemInfo') }}</span>
             </div>
           </template>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">操作系统</span>
+              <span class="info-label">{{ t('tool.useragent-parser.os') }}</span>
               <span class="info-value">{{ parsedResult.os }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">系统版本</span>
+              <span class="info-label">{{ t('tool.useragent-parser.osVersion') }}</span>
               <span class="info-value">{{ parsedResult.osVersion || '-' }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">设备类型</span>
+              <span class="info-label">{{ t('tool.useragent-parser.deviceType') }}</span>
               <span class="info-value">{{ parsedResult.device }}</span>
             </div>
           </div>

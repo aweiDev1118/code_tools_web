@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const originalImage = ref('')
 const compressedImage = ref('')
@@ -76,7 +79,7 @@ const download = () => {
   link.download = 'compressed.jpg'
   link.href = compressedImage.value
   link.click()
-  ElMessage.success('下载成功')
+  ElMessage.success(t('tool.image-compress.downloadSuccess'))
 }
 
 const formatSize = (bytes: number) => {
@@ -103,27 +106,27 @@ const clear = () => {
 <template>
   <div class="max-w-6xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">图片压缩</h1>
-      <p class="text-gray-500">在线压缩图片，减小文件体积</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.image-compress.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.image-compress.subtitle') }}</p>
     </div>
 
     <el-card class="mb-4">
       <div class="flex flex-wrap gap-6 items-center">
         <div class="flex items-center gap-2">
-          <span class="text-sm">质量:</span>
+          <span class="text-sm">{{ t('tool.image-compress.quality') }}:</span>
           <el-slider v-model="quality" :min="10" :max="100" style="width: 150px" @change="compress" />
           <span class="text-sm w-10">{{ quality }}%</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-sm">最大宽度:</span>
+          <span class="text-sm">{{ t('tool.image-compress.maxWidth') }}:</span>
           <el-input-number v-model="maxWidth" :min="100" :max="4096" size="small" @change="compress" />
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-sm">最大高度:</span>
+          <span class="text-sm">{{ t('tool.image-compress.maxHeight') }}:</span>
           <el-input-number v-model="maxHeight" :min="100" :max="4096" size="small" @change="compress" />
         </div>
-        <el-checkbox v-model="maintainRatio" @change="compress">保持比例</el-checkbox>
-        <el-button @click="clear">清空</el-button>
+        <el-checkbox v-model="maintainRatio" @change="compress">{{ t('tool.image-compress.maintainRatio') }}</el-checkbox>
+        <el-button @click="clear">{{ t('common.clear') }}</el-button>
       </div>
     </el-card>
 
@@ -131,7 +134,7 @@ const clear = () => {
       <el-card>
         <template #header>
           <div class="flex justify-between">
-            <span>原图</span>
+            <span>{{ t('tool.image-compress.originalImage') }}</span>
             <span v-if="originalSize" class="text-sm text-gray-500">
               {{ formatSize(originalSize) }} | {{ originalDimensions.width }} x {{ originalDimensions.height }}
             </span>
@@ -146,7 +149,7 @@ const clear = () => {
           :on-change="(file: any) => handleFileChange(file.raw)"
         >
           <el-icon size="48" class="text-gray-400"><Upload /></el-icon>
-          <div class="text-gray-500 mt-2">拖拽图片或点击选择</div>
+          <div class="text-gray-500 mt-2">{{ t('tool.image-compress.uploadHint') }}</div>
         </el-upload>
         <div v-else class="flex items-center justify-center min-h-[200px] bg-gray-50 dark:bg-gray-700 rounded">
           <img :src="originalImage" alt="Original" class="max-w-full max-h-[300px]" />
@@ -156,7 +159,7 @@ const clear = () => {
       <el-card>
         <template #header>
           <div class="flex justify-between items-center">
-            <span>压缩后</span>
+            <span>{{ t('tool.image-compress.compressedImage') }}</span>
             <div v-if="compressedSize" class="flex items-center gap-2">
               <span class="text-sm text-gray-500">
                 {{ formatSize(compressedSize) }} | {{ compressedDimensions.width }} x {{ compressedDimensions.height }}
@@ -167,10 +170,10 @@ const clear = () => {
         </template>
         <div class="flex items-center justify-center min-h-[200px] bg-gray-50 dark:bg-gray-700 rounded">
           <img v-if="compressedImage" :src="compressedImage" alt="Compressed" class="max-w-full max-h-[300px]" />
-          <span v-else class="text-gray-400">压缩结果</span>
+          <span v-else class="text-gray-400">{{ t('tool.image-compress.compressResult') }}</span>
         </div>
         <el-button v-if="compressedImage" type="primary" class="w-full mt-4" @click="download">
-          下载压缩图片
+          {{ t('tool.image-compress.downloadCompressed') }}
         </el-button>
       </el-card>
     </div>

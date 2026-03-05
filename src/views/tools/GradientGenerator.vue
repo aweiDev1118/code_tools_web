@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const gradientType = ref<'linear' | 'radial'>('linear')
 const angle = ref(90)
@@ -23,16 +26,16 @@ const cssCode = computed(() => {
   return `background: ${gradientStyle.value};`
 })
 
-const presets = [
-  { name: '紫蓝', colors: ['#667eea', '#764ba2'] },
-  { name: '橙红', colors: ['#f093fb', '#f5576c'] },
-  { name: '青绿', colors: ['#4facfe', '#00f2fe'] },
-  { name: '日落', colors: ['#fa709a', '#fee140'] },
-  { name: '森林', colors: ['#0ba360', '#3cba92'] },
-  { name: '海洋', colors: ['#2193b0', '#6dd5ed'] },
-  { name: '火焰', colors: ['#ff512f', '#f09819'] },
-  { name: '极光', colors: ['#00c6ff', '#0072ff'] },
-]
+const presets = computed(() => [
+  { name: t('tool.gradient-generator.presetPurpleBlue'), colors: ['#667eea', '#764ba2'] },
+  { name: t('tool.gradient-generator.presetOrangeRed'), colors: ['#f093fb', '#f5576c'] },
+  { name: t('tool.gradient-generator.presetCyanGreen'), colors: ['#4facfe', '#00f2fe'] },
+  { name: t('tool.gradient-generator.presetSunset'), colors: ['#fa709a', '#fee140'] },
+  { name: t('tool.gradient-generator.presetForest'), colors: ['#0ba360', '#3cba92'] },
+  { name: t('tool.gradient-generator.presetOcean'), colors: ['#2193b0', '#6dd5ed'] },
+  { name: t('tool.gradient-generator.presetFlame'), colors: ['#ff512f', '#f09819'] },
+  { name: t('tool.gradient-generator.presetAurora'), colors: ['#00c6ff', '#0072ff'] },
+])
 
 const applyPreset = (preset: { colors: string[] }) => {
   color1.value = preset.colors[0]
@@ -41,7 +44,7 @@ const applyPreset = (preset: { colors: string[] }) => {
 }
 
 const copy = () => {
-  copyToClipboard(cssCode.value, 'CSS 已复制')
+  copyToClipboard(cssCode.value, t('tool.gradient-generator.cssCopied'))
 }
 
 const randomGradient = () => {
@@ -56,65 +59,65 @@ const randomGradient = () => {
 <template>
   <div class="max-w-5xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">渐变生成器</h1>
-      <p class="text-gray-500">生成 CSS 渐变背景</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.gradient-generator.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.gradient-generator.subtitle') }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="space-y-4">
         <el-card>
-          <template #header>渐变设置</template>
+          <template #header>{{ t('tool.gradient-generator.settings') }}</template>
 
           <div class="space-y-4">
             <div class="flex items-center gap-4">
-              <span class="w-20">类型:</span>
+              <span class="w-20">{{ t('tool.gradient-generator.type') }}:</span>
               <el-radio-group v-model="gradientType">
-                <el-radio-button value="linear">线性</el-radio-button>
-                <el-radio-button value="radial">径向</el-radio-button>
+                <el-radio-button value="linear">{{ t('tool.gradient-generator.linear') }}</el-radio-button>
+                <el-radio-button value="radial">{{ t('tool.gradient-generator.radial') }}</el-radio-button>
               </el-radio-group>
             </div>
 
             <div v-if="gradientType === 'linear'" class="flex items-center gap-4">
-              <span class="w-20">角度:</span>
+              <span class="w-20">{{ t('tool.gradient-generator.angle') }}:</span>
               <el-slider v-model="angle" :min="0" :max="360" show-input class="flex-1" />
             </div>
 
             <div v-if="gradientType === 'radial'" class="flex items-center gap-4">
-              <span class="w-20">形状:</span>
+              <span class="w-20">{{ t('tool.gradient-generator.shape') }}:</span>
               <el-radio-group v-model="radialShape">
-                <el-radio-button value="circle">圆形</el-radio-button>
-                <el-radio-button value="ellipse">椭圆</el-radio-button>
+                <el-radio-button value="circle">{{ t('tool.gradient-generator.circle') }}</el-radio-button>
+                <el-radio-button value="ellipse">{{ t('tool.gradient-generator.ellipse') }}</el-radio-button>
               </el-radio-group>
             </div>
 
             <div class="flex items-center gap-4">
-              <span class="w-20">颜色 1:</span>
+              <span class="w-20">{{ t('tool.gradient-generator.color1') }}:</span>
               <el-color-picker v-model="color1" />
               <el-input v-model="color1" style="width: 100px" />
             </div>
 
             <div class="flex items-center gap-4">
-              <span class="w-20">颜色 2:</span>
+              <span class="w-20">{{ t('tool.gradient-generator.color2') }}:</span>
               <el-color-picker v-model="color2" />
               <el-input v-model="color2" style="width: 100px" />
             </div>
 
             <div class="flex items-center gap-4">
-              <span class="w-20">颜色 3:</span>
+              <span class="w-20">{{ t('tool.gradient-generator.color3') }}:</span>
               <el-color-picker v-model="color3" />
-              <el-input v-model="color3" style="width: 100px" placeholder="可选" />
-              <el-button v-if="color3" size="small" @click="color3 = ''">移除</el-button>
+              <el-input v-model="color3" style="width: 100px" :placeholder="t('tool.gradient-generator.optional')" />
+              <el-button v-if="color3" size="small" @click="color3 = ''">{{ t('tool.gradient-generator.remove') }}</el-button>
             </div>
 
             <div class="flex gap-2">
-              <el-button type="primary" @click="copy">复制 CSS</el-button>
-              <el-button @click="randomGradient">随机生成</el-button>
+              <el-button type="primary" @click="copy">{{ t('tool.gradient-generator.copyCss') }}</el-button>
+              <el-button @click="randomGradient">{{ t('tool.gradient-generator.random') }}</el-button>
             </div>
           </div>
         </el-card>
 
         <el-card>
-          <template #header>预设方案</template>
+          <template #header>{{ t('tool.gradient-generator.presets') }}</template>
           <div class="grid grid-cols-4 gap-2">
             <div
               v-for="preset in presets"
@@ -130,7 +133,7 @@ const randomGradient = () => {
 
       <div class="space-y-4">
         <el-card>
-          <template #header>预览</template>
+          <template #header>{{ t('tool.gradient-generator.preview') }}</template>
           <div
             class="h-64 rounded-lg"
             :style="{ background: gradientStyle }"
@@ -138,11 +141,11 @@ const randomGradient = () => {
         </el-card>
 
         <el-card>
-          <template #header>CSS 代码</template>
+          <template #header>{{ t('tool.gradient-generator.cssCode') }}</template>
           <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded font-mono text-sm">
             {{ cssCode }}
           </div>
-          <el-button class="w-full mt-4" @click="copy">复制 CSS</el-button>
+          <el-button class="w-full mt-4" @click="copy">{{ t('tool.gradient-generator.copyCss') }}</el-button>
         </el-card>
       </div>
     </div>

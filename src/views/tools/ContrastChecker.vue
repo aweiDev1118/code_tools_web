@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const fgColor = ref('#000000')
 const bgColor = ref('#ffffff')
@@ -40,10 +43,10 @@ interface CheckResult {
 }
 
 const checks = computed<CheckResult[]>(() => [
-  { label: 'AA 普通文本', threshold: 4.5, pass: ratio.value >= 4.5 },
-  { label: 'AA 大文本', threshold: 3, pass: ratio.value >= 3 },
-  { label: 'AAA 普通文本', threshold: 7, pass: ratio.value >= 7 },
-  { label: 'AAA 大文本', threshold: 4.5, pass: ratio.value >= 4.5 },
+  { label: t('tool.contrast-checker.aaNormal'), threshold: 4.5, pass: ratio.value >= 4.5 },
+  { label: t('tool.contrast-checker.aaLarge'), threshold: 3, pass: ratio.value >= 3 },
+  { label: t('tool.contrast-checker.aaaNormal'), threshold: 7, pass: ratio.value >= 7 },
+  { label: t('tool.contrast-checker.aaaLarge'), threshold: 4.5, pass: ratio.value >= 4.5 },
 ])
 
 function swapColors() {
@@ -72,15 +75,15 @@ const ratioLevel = computed(() => {
 <template>
   <div class="max-w-5xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">WCAG 对比度检测</h1>
-      <p class="text-gray-500 dark:text-gray-400">检测前景色与背景色的对比度是否符合 WCAG 2.0 无障碍标准</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.contrast-checker.name') }}</h1>
+      <p class="text-gray-500 dark:text-gray-400">{{ t('tool.contrast-checker.subtitle') }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <!-- 前景色 -->
       <el-card>
         <template #header>
-          <span class="font-semibold">前景色（文字颜色）</span>
+          <span class="font-semibold">{{ t('tool.contrast-checker.fgColor') }}</span>
         </template>
         <div class="flex flex-col items-center gap-4">
           <el-color-picker v-model="fgColor" size="large" color-format="hex" />
@@ -98,7 +101,7 @@ const ratioLevel = computed(() => {
       <!-- 背景色 -->
       <el-card>
         <template #header>
-          <span class="font-semibold">背景色</span>
+          <span class="font-semibold">{{ t('tool.contrast-checker.bgColor') }}</span>
         </template>
         <div class="flex flex-col items-center gap-4">
           <el-color-picker v-model="bgColor" size="large" color-format="hex" />
@@ -117,7 +120,7 @@ const ratioLevel = computed(() => {
     <!-- 互换按钮 -->
     <div class="flex justify-center mb-6">
       <el-button type="primary" plain @click="swapColors">
-        ⇄ 互换颜色
+        ⇄ {{ t('tool.contrast-checker.swapColors') }}
       </el-button>
     </div>
 
@@ -126,7 +129,7 @@ const ratioLevel = computed(() => {
       <!-- 比值 + WCAG 结果 -->
       <el-card>
         <template #header>
-          <span class="font-semibold">检测结果</span>
+          <span class="font-semibold">{{ t('tool.contrast-checker.checkResult') }}</span>
         </template>
         <div class="text-center mb-6">
           <div class="text-5xl font-bold mb-2" :class="{
@@ -137,7 +140,7 @@ const ratioLevel = computed(() => {
           }">
             {{ ratioDisplay }}
           </div>
-          <div class="text-gray-500 dark:text-gray-400 text-sm">对比度比值</div>
+          <div class="text-gray-500 dark:text-gray-400 text-sm">{{ t('tool.contrast-checker.contrastRatio') }}</div>
         </div>
         <div class="space-y-3">
           <div
@@ -162,22 +165,22 @@ const ratioLevel = computed(() => {
       <!-- 预览区域 -->
       <el-card>
         <template #header>
-          <span class="font-semibold">实时预览</span>
+          <span class="font-semibold">{{ t('tool.contrast-checker.livePreview') }}</span>
         </template>
         <div
           class="rounded-lg p-6 space-y-4"
           :style="{ backgroundColor: bgColor, color: fgColor }"
         >
           <div>
-            <div class="text-xs mb-1 opacity-60" :style="{ color: fgColor }">普通文本 (16px)</div>
+            <div class="text-xs mb-1 opacity-60" :style="{ color: fgColor }">{{ t('tool.contrast-checker.normalText') }} (16px)</div>
             <p class="text-base leading-relaxed">
-              这是普通大小的文字示例。The quick brown fox jumps over the lazy dog.
+              {{ t('tool.contrast-checker.sampleNormalText') }}
             </p>
           </div>
           <div>
-            <div class="text-xs mb-1 opacity-60" :style="{ color: fgColor }">大文本 (24px / 粗体)</div>
+            <div class="text-xs mb-1 opacity-60" :style="{ color: fgColor }">{{ t('tool.contrast-checker.largeText') }} (24px / {{ t('tool.contrast-checker.bold') }})</div>
             <p class="text-2xl font-bold">
-              大字体文字示例 Large Text Preview
+              {{ t('tool.contrast-checker.sampleLargeText') }}
             </p>
           </div>
         </div>

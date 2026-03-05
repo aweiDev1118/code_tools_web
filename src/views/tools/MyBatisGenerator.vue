@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 interface Field {
   column: string
@@ -116,7 +119,7 @@ const parseSqlType = (typeStr: string): string => {
 // 解析建表 SQL
 const parseSql = () => {
   if (!sqlInput.value.trim()) {
-    ElMessage.warning('请输入建表 SQL')
+    ElMessage.warning(t('tool.mybatis-generator.inputRequired'))
     return
   }
 
@@ -126,7 +129,7 @@ const parseSql = () => {
     // 提取表名
     const tableNameMatch = sql.match(/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"]?(\w+)[`"]?/i)
     if (!tableNameMatch) {
-      throw new Error('无法解析表名')
+      throw new Error(t('tool.mybatis-generator.cannotParseTableName'))
     }
     const tableName = tableNameMatch[1]
 
@@ -144,7 +147,7 @@ const parseSql = () => {
     // 获取括号内的内容
     const innerMatch = sql.match(/\(([\s\S]+)\)/);
     if (!innerMatch) {
-      throw new Error('无法解析表定义')
+      throw new Error(t('tool.mybatis-generator.cannotParseTableDef'))
     }
 
     const innerContent = innerMatch[1]
@@ -188,7 +191,7 @@ const parseSql = () => {
     }
 
     if (fields.length === 0) {
-      throw new Error('未找到字段定义')
+      throw new Error(t('tool.mybatis-generator.noFieldsFound'))
     }
 
     tableInfo.value = {
@@ -198,9 +201,9 @@ const parseSql = () => {
       fields
     }
 
-    ElMessage.success('解析成功')
+    ElMessage.success(t('tool.mybatis-generator.parseSuccess'))
   } catch (e) {
-    ElMessage.error('解析失败: ' + (e as Error).message)
+    ElMessage.error(t('tool.mybatis-generator.parseFailed') + ': ' + (e as Error).message)
   }
 }
 
@@ -483,7 +486,7 @@ ${batchUpdateSetItems}
 
 const copyEntity = () => {
   if (!entityOutput.value) {
-    ElMessage.warning('请先解析建表 SQL')
+    ElMessage.warning(t('tool.mybatis-generator.parseFirst'))
     return
   }
   copyToClipboard(entityOutput.value)
@@ -491,7 +494,7 @@ const copyEntity = () => {
 
 const copyMapper = () => {
   if (!mapperOutput.value) {
-    ElMessage.warning('请先解析建表 SQL')
+    ElMessage.warning(t('tool.mybatis-generator.parseFirst'))
     return
   }
   copyToClipboard(mapperOutput.value)
@@ -499,7 +502,7 @@ const copyMapper = () => {
 
 const copyXml = () => {
   if (!xmlOutput.value) {
-    ElMessage.warning('请先解析建表 SQL')
+    ElMessage.warning(t('tool.mybatis-generator.parseFirst'))
     return
   }
   copyToClipboard(xmlOutput.value)
@@ -530,8 +533,8 @@ const loadSample = () => {
 <template>
   <div class="max-w-7xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">MyBatis 代码生成</h1>
-      <p class="text-gray-500">根据建表 SQL 生成实体类、Mapper 接口和 XML 配置文件</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.mybatis-generator.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.mybatis-generator.subtitle') }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -539,38 +542,38 @@ const loadSample = () => {
       <el-card>
         <template #header>
           <div class="flex items-center justify-between">
-            <span>建表 SQL 输入</span>
+            <span>{{ t('tool.mybatis-generator.sqlInputHeader') }}</span>
             <div class="flex gap-2">
-              <el-button size="small" @click="loadSample" text>示例</el-button>
-              <el-button size="small" @click="clear">清空</el-button>
+              <el-button size="small" @click="loadSample" text>{{ t('tool.mybatis-generator.sample') }}</el-button>
+              <el-button size="small" @click="clear">{{ t('common.clear') }}</el-button>
             </div>
           </div>
         </template>
 
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label class="block text-sm mb-2">实体类包名</label>
+            <label class="block text-sm mb-2">{{ t('tool.mybatis-generator.entityPackage') }}</label>
             <el-input v-model="entityPackage" placeholder="com.example.entity" />
           </div>
           <div>
-            <label class="block text-sm mb-2">Mapper 包名</label>
+            <label class="block text-sm mb-2">{{ t('tool.mybatis-generator.mapperPackage') }}</label>
             <el-input v-model="mapperPackage" placeholder="com.example.mapper" />
           </div>
         </div>
 
         <div class="mb-4">
-          <label class="block text-sm mb-2">建表 SQL</label>
+          <label class="block text-sm mb-2">{{ t('tool.mybatis-generator.sqlLabel') }}</label>
           <el-input
             v-model="sqlInput"
             type="textarea"
             :rows="18"
-            placeholder="请粘贴 CREATE TABLE SQL 语句..."
+            :placeholder="t('tool.mybatis-generator.sqlPlaceholder')"
             class="font-mono text-sm"
           />
         </div>
 
         <el-button type="primary" @click="parseSql" class="w-full">
-          解析并生成
+          {{ t('tool.mybatis-generator.parseAndGenerate') }}
         </el-button>
       </el-card>
 
@@ -578,49 +581,49 @@ const loadSample = () => {
       <el-card>
         <template #header>
           <div class="flex items-center justify-between">
-            <span>生成结果</span>
+            <span>{{ t('tool.mybatis-generator.generatedResult') }}</span>
           </div>
         </template>
 
         <el-tabs v-model="activeTab">
-          <el-tab-pane label="实体类" name="entity">
+          <el-tab-pane :label="t('tool.mybatis-generator.entityTab')" name="entity">
             <div class="mb-2 flex justify-end">
-              <el-button size="small" @click="copyEntity">复制代码</el-button>
+              <el-button size="small" @click="copyEntity">{{ t('tool.mybatis-generator.copyCode') }}</el-button>
             </div>
             <el-input
               :model-value="entityOutput"
               type="textarea"
               :rows="20"
               readonly
-              placeholder="实体类代码将在这里显示..."
+              :placeholder="t('tool.mybatis-generator.entityPlaceholder')"
               class="font-mono text-sm"
             />
           </el-tab-pane>
 
-          <el-tab-pane label="Mapper 接口" name="mapper">
+          <el-tab-pane :label="t('tool.mybatis-generator.mapperTab')" name="mapper">
             <div class="mb-2 flex justify-end">
-              <el-button size="small" @click="copyMapper">复制代码</el-button>
+              <el-button size="small" @click="copyMapper">{{ t('tool.mybatis-generator.copyCode') }}</el-button>
             </div>
             <el-input
               :model-value="mapperOutput"
               type="textarea"
               :rows="20"
               readonly
-              placeholder="Mapper 接口代码将在这里显示..."
+              :placeholder="t('tool.mybatis-generator.mapperPlaceholder')"
               class="font-mono text-sm"
             />
           </el-tab-pane>
 
-          <el-tab-pane label="XML 配置" name="xml">
+          <el-tab-pane :label="t('tool.mybatis-generator.xmlTab')" name="xml">
             <div class="mb-2 flex justify-end">
-              <el-button size="small" @click="copyXml">复制代码</el-button>
+              <el-button size="small" @click="copyXml">{{ t('tool.mybatis-generator.copyCode') }}</el-button>
             </div>
             <el-input
               :model-value="xmlOutput"
               type="textarea"
               :rows="20"
               readonly
-              placeholder="XML 配置将在这里显示..."
+              :placeholder="t('tool.mybatis-generator.xmlPlaceholder')"
               class="font-mono text-sm"
             />
           </el-tab-pane>
@@ -628,25 +631,25 @@ const loadSample = () => {
 
         <!-- 解析结果预览 -->
         <div v-if="tableInfo" class="mt-4">
-          <el-divider content-position="left">解析结果</el-divider>
+          <el-divider content-position="left">{{ t('tool.mybatis-generator.parseResult') }}</el-divider>
           <el-descriptions :column="2" size="small" border>
-            <el-descriptions-item label="表名">{{ tableInfo.tableName }}</el-descriptions-item>
-            <el-descriptions-item label="类名">{{ tableInfo.className }}</el-descriptions-item>
-            <el-descriptions-item label="字段数">{{ tableInfo.fields.length }}</el-descriptions-item>
-            <el-descriptions-item label="主键">
-              {{ tableInfo.fields.find(f => f.isPrimaryKey)?.column || '未识别' }}
+            <el-descriptions-item :label="t('tool.mybatis-generator.tableName')">{{ tableInfo.tableName }}</el-descriptions-item>
+            <el-descriptions-item :label="t('tool.mybatis-generator.className')">{{ tableInfo.className }}</el-descriptions-item>
+            <el-descriptions-item :label="t('tool.mybatis-generator.fieldCount')">{{ tableInfo.fields.length }}</el-descriptions-item>
+            <el-descriptions-item :label="t('tool.mybatis-generator.primaryKey')">
+              {{ tableInfo.fields.find(f => f.isPrimaryKey)?.column || t('tool.mybatis-generator.unrecognized') }}
             </el-descriptions-item>
           </el-descriptions>
 
           <el-table :data="tableInfo.fields" size="small" class="mt-4" max-height="200">
-            <el-table-column prop="column" label="列名" width="120" />
-            <el-table-column prop="javaName" label="属性名" width="120" />
-            <el-table-column prop="sqlType" label="SQL类型" width="120" />
-            <el-table-column prop="javaType" label="Java类型" width="100" />
-            <el-table-column prop="comment" label="注释" min-width="120" show-overflow-tooltip />
-            <el-table-column label="主键" width="60" align="center">
+            <el-table-column prop="column" :label="t('tool.mybatis-generator.colColumn')" width="120" />
+            <el-table-column prop="javaName" :label="t('tool.mybatis-generator.colJavaName')" width="120" />
+            <el-table-column prop="sqlType" :label="t('tool.mybatis-generator.colSqlType')" width="120" />
+            <el-table-column prop="javaType" :label="t('tool.mybatis-generator.colJavaType')" width="100" />
+            <el-table-column prop="comment" :label="t('tool.mybatis-generator.colComment')" min-width="120" show-overflow-tooltip />
+            <el-table-column :label="t('tool.mybatis-generator.colPrimaryKey')" width="60" align="center">
               <template #default="{ row }">
-                <el-tag v-if="row.isPrimaryKey" type="success" size="small">是</el-tag>
+                <el-tag v-if="row.isPrimaryKey" type="success" size="small">{{ t('tool.mybatis-generator.yes') }}</el-tag>
               </template>
             </el-table-column>
           </el-table>
@@ -656,32 +659,32 @@ const loadSample = () => {
 
     <!-- 功能说明 -->
     <el-card class="mt-4">
-      <template #header>功能说明</template>
+      <template #header>{{ t('tool.mybatis-generator.featureDesc') }}</template>
       <div class="text-sm text-gray-600 dark:text-gray-400">
-        <p class="mb-2">支持解析 MySQL CREATE TABLE 语句，自动提取：</p>
+        <p class="mb-2">{{ t('tool.mybatis-generator.supportsParsing') }}</p>
         <ul class="list-disc list-inside space-y-1 mb-4">
-          <li>表名和表注释</li>
-          <li>字段名、类型、注释</li>
-          <li>主键信息</li>
-          <li>自动转换为 Java 驼峰命名</li>
+          <li>{{ t('tool.mybatis-generator.feat1') }}</li>
+          <li>{{ t('tool.mybatis-generator.feat2') }}</li>
+          <li>{{ t('tool.mybatis-generator.feat3') }}</li>
+          <li>{{ t('tool.mybatis-generator.feat4') }}</li>
         </ul>
-        <p class="mb-2">生成的代码包含：</p>
+        <p class="mb-2">{{ t('tool.mybatis-generator.generatedIncludes') }}</p>
         <ul class="list-disc list-inside space-y-1 mb-4">
-          <li><strong>实体类</strong> - 使用 Lombok @Data 注解</li>
-          <li><strong>Mapper 接口</strong> - 包含常用 CRUD 方法</li>
-          <li><strong>XML 配置</strong> - 完整的 SQL 映射</li>
+          <li><strong>{{ t('tool.mybatis-generator.entityClass') }}</strong> - {{ t('tool.mybatis-generator.entityClassDesc') }}</li>
+          <li><strong>{{ t('tool.mybatis-generator.mapperInterface') }}</strong> - {{ t('tool.mybatis-generator.mapperInterfaceDesc') }}</li>
+          <li><strong>{{ t('tool.mybatis-generator.xmlConfig') }}</strong> - {{ t('tool.mybatis-generator.xmlConfigDesc') }}</li>
         </ul>
-        <p class="mb-2">Mapper 接口方法列表：</p>
+        <p class="mb-2">{{ t('tool.mybatis-generator.mapperMethods') }}</p>
         <ul class="list-disc list-inside space-y-1">
-          <li><code>insertSelective</code> - 选择性插入</li>
-          <li><code>insertBatchSelective</code> - 批量选择性插入</li>
-          <li><code>deleteByPrimaryKey</code> - 根据主键删除</li>
-          <li><code>updateByPrimaryKeySelective</code> - 根据主键选择性更新</li>
-          <li><code>updateBatchByPrimaryKeySelective</code> - 批量根据主键选择性更新</li>
-          <li><code>selectByPrimaryKey</code> - 根据主键查询</li>
-          <li><code>selectCountByMap</code> - 根据条件查询数量</li>
-          <li><code>selectByMap</code> - 根据条件查询单条</li>
-          <li><code>selectListByMap</code> - 根据条件查询列表</li>
+          <li><code>insertSelective</code> - {{ t('tool.mybatis-generator.method1') }}</li>
+          <li><code>insertBatchSelective</code> - {{ t('tool.mybatis-generator.method2') }}</li>
+          <li><code>deleteByPrimaryKey</code> - {{ t('tool.mybatis-generator.method3') }}</li>
+          <li><code>updateByPrimaryKeySelective</code> - {{ t('tool.mybatis-generator.method4') }}</li>
+          <li><code>updateBatchByPrimaryKeySelective</code> - {{ t('tool.mybatis-generator.method5') }}</li>
+          <li><code>selectByPrimaryKey</code> - {{ t('tool.mybatis-generator.method6') }}</li>
+          <li><code>selectCountByMap</code> - {{ t('tool.mybatis-generator.method7') }}</li>
+          <li><code>selectByMap</code> - {{ t('tool.mybatis-generator.method8') }}</li>
+          <li><code>selectListByMap</code> - {{ t('tool.mybatis-generator.method9') }}</li>
         </ul>
       </div>
     </el-card>

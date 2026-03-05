@@ -111,7 +111,7 @@ provide('closeSidebar', closeSidebar)
     />
 
     <!-- 移动端遮罩层 -->
-    <Transition name="fade">
+    <Transition name="overlay-fade">
       <div
         v-if="isMobile && sidebarVisible"
         class="sidebar-overlay"
@@ -138,14 +138,24 @@ provide('closeSidebar', closeSidebar)
 </template>
 
 <style scoped>
+/* ---- Background mesh gradient ---- */
 .app-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
-  transition: background 0.3s ease;
+  position: relative;
+  background-color: #fafafa;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% -10%, rgba(99, 102, 241, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 110%, rgba(168, 85, 247, 0.02) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(59, 130, 246, 0.01) 0%, transparent 70%);
+  transition: background-color 0.3s ease, background-image 0.3s ease;
 }
 
 .app-container.dark {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background-color: #0a0b0d;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% -10%, rgba(99, 102, 241, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 100%, rgba(139, 92, 246, 0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 40% at 50% 50%, rgba(37, 99, 235, 0.02) 0%, transparent 70%);
 }
 
 .main-content {
@@ -160,41 +170,45 @@ provide('closeSidebar', closeSidebar)
   margin-left: 72px;
 }
 
-/* Page Transition */
-.page-enter-active,
+/* ---- Page Transition: slide-up + fade ---- */
+.page-enter-active {
+  transition: opacity 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
 .page-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .page-enter-from {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(12px);
 }
 
 .page-leave-to {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-6px);
 }
 
-/* Mobile Overlay */
+/* ---- Mobile Overlay: richer blur ---- */
 .sidebar-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(2, 6, 23, 0.55);
   z-index: 95;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
+.overlay-fade-enter-active,
+.overlay-fade-leave-active {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.overlay-fade-enter-from,
+.overlay-fade-leave-to {
   opacity: 0;
 }
 

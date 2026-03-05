@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const count = ref(3)
 const lang = ref<'zh' | 'en'>('zh')
@@ -65,33 +68,33 @@ const copyResult = () => {
 <template>
   <div class="max-w-5xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Lorem Ipsum 生成器</h1>
-      <p class="text-gray-500">生成占位文本，支持中英文</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.lorem-ipsum.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.lorem-ipsum.subtitle') }}</p>
     </div>
 
     <el-card class="mb-4">
-      <template #header>生成选项</template>
+      <template #header>{{ t('tool.lorem-ipsum.optionsHeader') }}</template>
       <div class="flex flex-wrap items-center gap-6">
         <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600 dark:text-gray-300">语言：</span>
+          <span class="text-sm text-gray-600 dark:text-gray-300">{{ t('tool.lorem-ipsum.languageLabel') }}：</span>
           <el-radio-group v-model="lang">
-            <el-radio-button value="zh">中文</el-radio-button>
+            <el-radio-button value="zh">{{ t('tool.lorem-ipsum.chinese') }}</el-radio-button>
             <el-radio-button value="en">English</el-radio-button>
           </el-radio-group>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600 dark:text-gray-300">段落数：</span>
+          <span class="text-sm text-gray-600 dark:text-gray-300">{{ t('tool.lorem-ipsum.paragraphCount') }}：</span>
           <el-input-number v-model="count" :min="1" :max="20" :step="1" />
         </div>
-        <el-button type="primary" @click="copyResult">复制全部</el-button>
+        <el-button type="primary" @click="copyResult">{{ t('tool.lorem-ipsum.copyAll') }}</el-button>
       </div>
     </el-card>
 
     <el-card>
       <template #header>
         <div class="flex items-center justify-between">
-          <span>生成结果（{{ count }} 段）</span>
-          <span class="text-sm text-gray-400">共 {{ result.length }} 字符</span>
+          <span>{{ t('tool.lorem-ipsum.resultHeader', { count }) }}</span>
+          <span class="text-sm text-gray-400">{{ t('tool.lorem-ipsum.charCount', { count: result.length }) }}</span>
         </div>
       </template>
       <div class="prose dark:prose-invert max-w-none">

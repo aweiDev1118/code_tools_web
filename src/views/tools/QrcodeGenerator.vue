@@ -3,6 +3,9 @@ import { ref, watch } from 'vue'
 import QRCode from 'qrcode'
 import { ElMessage } from 'element-plus'
 import { copyToClipboard } from '@/utils/clipboard'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const input = ref('https://example.com')
 const qrcodeUrl = ref('')
@@ -27,7 +30,7 @@ const generateQRCode = async () => {
       }
     })
   } catch {
-    ElMessage.error('生成失败')
+    ElMessage.error(t('tool.qrcode-generator.generateFail'))
   }
 }
 
@@ -49,12 +52,12 @@ const copyImage = async () => {
       await navigator.clipboard.write([
         new ClipboardItem({ 'image/png': blob })
       ])
-      ElMessage.success('已复制图片')
+      ElMessage.success(t('tool.qrcode-generator.imageCopied'))
       return
     } catch { }
   }
   // 降级方案：复制 Base64 字符串
-  copyToClipboard(qrcodeUrl.value, '已复制图片数据')
+  copyToClipboard(qrcodeUrl.value, t('tool.qrcode-generator.imageDataCopied'))
 }
 
 watch([input, size, errorLevel, darkColor, lightColor], generateQRCode, { immediate: true })
@@ -63,30 +66,30 @@ watch([input, size, errorLevel, darkColor, lightColor], generateQRCode, { immedi
 <template>
   <div class="max-w-4xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">二维码生成</h1>
-      <p class="text-gray-500">将文本或链接转换为二维码图片</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.qrcode-generator.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.qrcode-generator.subtitle') }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <el-card>
-        <template #header>输入内容</template>
+        <template #header>{{ t('tool.qrcode-generator.inputContent') }}</template>
         <el-input
           v-model="input"
           type="textarea"
           :rows="4"
-          placeholder="请输入文本或网址..."
+          :placeholder="t('tool.qrcode-generator.inputPlaceholder')"
         />
 
         <el-divider />
 
         <div class="space-y-4">
           <div class="flex items-center gap-4">
-            <span class="text-sm w-20">尺寸:</span>
+            <span class="text-sm w-20">{{ t('tool.qrcode-generator.size') }}:</span>
             <el-slider v-model="size" :min="100" :max="500" :step="50" show-input />
           </div>
 
           <div class="flex items-center gap-4">
-            <span class="text-sm w-20">容错级别:</span>
+            <span class="text-sm w-20">{{ t('tool.qrcode-generator.errorLevel') }}:</span>
             <el-radio-group v-model="errorLevel">
               <el-radio-button value="L">L (7%)</el-radio-button>
               <el-radio-button value="M">M (15%)</el-radio-button>
@@ -96,9 +99,9 @@ watch([input, size, errorLevel, darkColor, lightColor], generateQRCode, { immedi
           </div>
 
           <div class="flex items-center gap-4">
-            <span class="text-sm w-20">前景色:</span>
+            <span class="text-sm w-20">{{ t('tool.qrcode-generator.foreground') }}:</span>
             <el-color-picker v-model="darkColor" />
-            <span class="text-sm w-20 ml-4">背景色:</span>
+            <span class="text-sm w-20 ml-4">{{ t('tool.qrcode-generator.background') }}:</span>
             <el-color-picker v-model="lightColor" />
           </div>
         </div>
@@ -107,10 +110,10 @@ watch([input, size, errorLevel, darkColor, lightColor], generateQRCode, { immedi
       <el-card>
         <template #header>
           <div class="flex justify-between items-center">
-            <span>二维码</span>
+            <span>{{ t('tool.qrcode-generator.qrcode') }}</span>
             <div class="flex gap-2">
-              <el-button size="small" @click="copyImage" :disabled="!qrcodeUrl">复制</el-button>
-              <el-button size="small" type="primary" @click="download" :disabled="!qrcodeUrl">下载</el-button>
+              <el-button size="small" @click="copyImage" :disabled="!qrcodeUrl">{{ t('common.copy') }}</el-button>
+              <el-button size="small" type="primary" @click="download" :disabled="!qrcodeUrl">{{ t('common.download') }}</el-button>
             </div>
           </div>
         </template>
@@ -121,7 +124,7 @@ watch([input, size, errorLevel, darkColor, lightColor], generateQRCode, { immedi
             alt="QR Code"
             class="max-w-full"
           />
-          <el-empty v-else description="输入内容后生成二维码" />
+          <el-empty v-else :description="t('tool.qrcode-generator.emptyHint')" />
         </div>
       </el-card>
     </div>

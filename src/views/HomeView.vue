@@ -1,64 +1,96 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { categories, getToolsByCategory, tools } from '@/config/tools'
 import ToolCard from '@/components/common/ToolCard.vue'
+
+const { t } = useI18n()
+
+onMounted(() => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible')
+        observer.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.1 })
+
+  document.querySelectorAll('.category-block').forEach(el => observer.observe(el))
+})
 </script>
 
 <template>
   <div class="home-container">
-    <!-- Hero Section -->
+    <!-- ---- Hero Section ---- -->
     <div class="hero-section">
-      <div class="hero-bg"></div>
+      <!-- Aurora gradient decoration -->
+      <div class="hero-bg-mesh" aria-hidden="true" />
+
       <div class="hero-content">
-        <div class="hero-badge">
-          <el-icon><MagicStick /></el-icon>
-          <span>纯前端实现 · 数据安全</span>
-        </div>
+        <p class="hero-eyebrow">{{ t('home.title') }}</p>
+
+        <!-- Gradient headline -->
         <h1 class="hero-title">
-          开发者<span class="gradient-text">工具箱</span>
+          <span class="hero-title-gradient">DevToolbox</span>
         </h1>
-        <p class="hero-desc">
-          集成 {{ tools.length }}+ 款常用开发工具，JSON格式化、编码转换、时间戳、二维码生成等一应俱全
-        </p>
+
+        <p class="hero-subtitle">{{ t('home.subtitle') }}</p>
+        <p class="hero-desc">{{ t('home.description') }}</p>
+
+        <!-- Stats pills row -->
         <div class="hero-stats">
-          <div class="stat-item">
-            <div class="stat-value">{{ tools.length }}+</div>
-            <div class="stat-label">工具数量</div>
+          <div class="stat-pill">
+            <span class="stat-value">{{ tools.length }}+</span>
+            <span class="stat-label">{{ t('home.toolCount', { count: tools.length }) }}</span>
           </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-value">{{ categories.length }}</div>
-            <div class="stat-label">工具分类</div>
+          <div class="stat-divider" />
+          <div class="stat-pill">
+            <span class="stat-value">{{ categories.length }}</span>
+            <span class="stat-label">{{ t('home.allCategories') }}</span>
           </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-value">100%</div>
-            <div class="stat-label">免费使用</div>
+        </div>
+
+        <!-- Category pills: horizontal scroll -->
+        <div class="category-pills-wrapper">
+          <div class="category-pills">
+            <router-link
+              v-for="cat in categories"
+              :key="cat.id"
+              :to="`/category/${cat.id}`"
+              class="category-pill"
+            >
+              <el-icon size="13"><component :is="cat.icon" /></el-icon>
+              {{ t('category.' + cat.id) }}
+            </router-link>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Tools by Category -->
+    <!-- ---- Tools by Category ---- -->
     <div class="tools-section">
       <div
         v-for="category in categories"
         :key="category.id"
         class="category-block"
       >
+        <!-- Section header -->
         <div class="category-header">
           <div class="category-icon">
-            <el-icon size="20"><component :is="category.icon" /></el-icon>
+            <el-icon size="18"><component :is="category.icon" /></el-icon>
           </div>
-          <h2 class="category-title">{{ category.name }}</h2>
-          <div class="category-count">{{ getToolsByCategory(category.id).length }} 个工具</div>
-          <router-link
-            :to="`/category/${category.id}`"
-            class="category-more"
-          >
-            查看全部
+          <h2 class="category-title">{{ t('category.' + category.id) }}</h2>
+          <span class="category-count">
+            {{ t('home.toolCount', { count: getToolsByCategory(category.id).length }) }}
+          </span>
+          <router-link :to="`/category/${category.id}`" class="category-more">
+            {{ t('nav.allTools') }}
             <el-icon><ArrowRight /></el-icon>
           </router-link>
         </div>
+
+        <!-- Tools grid -->
         <div class="tools-grid">
           <ToolCard
             v-for="tool in getToolsByCategory(category.id).slice(0, 4)"
@@ -77,122 +109,150 @@ import ToolCard from '@/components/common/ToolCard.vue'
   margin: 0 auto;
 }
 
-/* Hero Section */
+/* ========================================
+   Hero Section
+   ======================================== */
+
 .hero-section {
   position: relative;
-  padding: 48px 32px;
-  margin-bottom: 48px;
+  padding: 80px 48px;
+  margin-bottom: 64px;
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }
 
 .dark .hero-section {
-  background: rgba(30, 41, 59, 0.6);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(17, 17, 19, 0.6);
+  border-color: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.hero-bg {
+/* Aurora gradient decoration */
+.hero-bg-mesh {
   position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 60%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  inset: 0;
   pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 55%);
+}
+
+/* Subtle noise texture overlay */
+.hero-bg-mesh::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+
+.dark .hero-bg-mesh {
+  background-image:
+    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(99, 102, 241, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 20%, rgba(139, 92, 246, 0.14) 0%, transparent 55%);
 }
 
 .hero-content {
   position: relative;
-  text-align: center;
+  z-index: 1;
+  max-width: 680px;
 }
 
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 100px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+.hero-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
   color: #6366f1;
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 24px;
-}
-
-.dark .hero-badge {
-  color: #a5b4fc;
-  border-color: rgba(99, 102, 241, 0.3);
-}
-
-.hero-title {
-  font-size: 42px;
-  font-weight: 800;
-  color: #1e293b;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   margin: 0 0 16px 0;
-  line-height: 1.2;
 }
 
-.dark .hero-title {
-  color: #f1f5f9;
+.dark .hero-eyebrow {
+  color: #818cf8;
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Large gradient headline */
+.hero-title {
+  font-size: 60px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  line-height: 1.0;
+  letter-spacing: -0.06em;
+}
+
+.hero-title-gradient {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.hero-desc {
-  font-size: 16px;
-  color: #64748b;
-  margin: 0 0 32px 0;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+.hero-subtitle {
+  font-size: 20px;
+  font-weight: 400;
+  color: #374151;
+  margin: 0 0 10px 0;
   line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+.dark .hero-subtitle {
+  color: #cbd5e1;
+}
+
+.hero-desc {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0 0 32px 0;
+  line-height: 1.7;
 }
 
 .dark .hero-desc {
   color: #94a3b8;
 }
 
+/* ---- Stats pills ---- */
 .hero-stats {
   display: inline-flex;
   align-items: center;
-  gap: 32px;
-  padding: 20px 32px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  gap: 24px;
+  padding: 16px 24px;
+  border-radius: 100px;
+  background: transparent;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 32px;
 }
 
 .dark .hero-stats {
-  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
-.stat-item {
-  text-align: center;
+.stat-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
 .stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  line-height: 1;
 }
 
 .stat-label {
-  font-size: 13px;
-  color: #64748b;
-  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6b7280;
+  white-space: nowrap;
 }
 
 .dark .stat-label {
@@ -201,55 +261,147 @@ import ToolCard from '@/components/common/ToolCard.vue'
 
 .stat-divider {
   width: 1px;
-  height: 40px;
-  background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+  height: 36px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1), transparent);
 }
 
-/* Tools Section */
+.dark .stat-divider {
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+/* ---- Category pills: horizontal scroll ---- */
+.category-pills-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+
+.category-pills-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.category-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: transparent;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  text-decoration: none;
+  white-space: nowrap;
+  scroll-snap-align: start;
+  transition: all 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.category-pill:hover {
+  background: rgba(99, 102, 241, 0.04);
+  border-color: rgba(99, 102, 241, 0.2);
+  color: #6366f1;
+  transform: translateY(-1px);
+}
+
+.dark .category-pill {
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.dark .category-pill:hover {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   Tools Section
+   ======================================== */
+
 .tools-section {
   display: flex;
   flex-direction: column;
   gap: 40px;
 }
 
+/* IntersectionObserver entrance animation */
 .category-block {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: rgba(255, 255, 255, 0.85);
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.category-block.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.category-block:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 .dark .category-block {
-  background: rgba(30, 41, 59, 0.4);
+  background: rgba(17, 17, 19, 0.75);
   border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
 }
 
+.dark .category-block:hover {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Section header ---- */
 .category-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
 .category-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.06);
+  border: 0.5px solid rgba(99, 102, 241, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3);
+  color: #6366f1;
+  flex-shrink: 0;
+}
+
+.dark .category-icon {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
 }
 
 .category-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  color: #1e293b;
+  color: #111827;
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .dark .category-title {
@@ -257,96 +409,79 @@ import ToolCard from '@/components/common/ToolCard.vue'
 }
 
 .category-count {
-  font-size: 13px;
-  color: #94a3b8;
-  padding: 4px 10px;
-  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6366f1;
+  padding: 3px 9px;
+  border-radius: 100px;
+  background: rgba(99, 102, 241, 0.06);
+  border: 0.5px solid rgba(99, 102, 241, 0.12);
+}
+
+.dark .category-count {
   background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
 }
 
 .category-more {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
   margin-left: auto;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
   color: #6366f1;
   text-decoration: none;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  transition: gap 0.16s ease, color 0.16s ease;
 }
 
 .category-more:hover {
   gap: 8px;
+  color: #4f46e5;
 }
 
 .dark .category-more {
+  color: #818cf8;
+}
+
+.dark .category-more:hover {
   color: #a5b4fc;
 }
 
+/* ---- Tools grid ---- */
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
 }
 
 /* ========================================
-   iPhone 适配 (iPhone 12-17 全系列)
+   Mobile
    ======================================== */
 
-/* 通用移动端 */
 @media (max-width: 430px) {
-  .home-container {
-    padding: 0;
-  }
-
   .hero-section {
-    padding: 28px 16px;
+    padding: 28px 20px;
     margin-bottom: 20px;
     border-radius: 16px;
   }
 
-  .hero-badge {
-    font-size: 12px;
-    padding: 6px 12px;
-    margin-bottom: 16px;
-  }
-
   .hero-title {
-    font-size: 26px;
-    margin-bottom: 12px;
+    font-size: 36px;
   }
 
-  .hero-desc {
-    font-size: 14px;
-    margin-bottom: 20px;
-    line-height: 1.5;
+  .hero-subtitle {
+    font-size: 16px;
   }
 
   .hero-stats {
-    flex-direction: row;
-    justify-content: space-around;
-    gap: 8px;
-    padding: 16px 12px;
     width: 100%;
-    border-radius: 12px;
+    justify-content: space-around;
   }
 
-  .stat-item {
-    flex: 1;
-  }
-
-  .stat-value {
-    font-size: 22px;
-  }
-
-  .stat-label {
-    font-size: 11px;
-  }
-
-  .stat-divider {
-    width: 1px;
-    height: 32px;
+  .category-pills {
+    flex-wrap: nowrap;
   }
 
   .tools-section {
@@ -354,32 +489,13 @@ import ToolCard from '@/components/common/ToolCard.vue'
   }
 
   .category-block {
-    padding: 14px;
+    padding: 16px;
     border-radius: 14px;
   }
 
   .category-header {
     flex-wrap: nowrap;
-    gap: 10px;
     margin-bottom: 14px;
-  }
-
-  .category-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    flex-shrink: 0;
-  }
-
-  .category-title {
-    font-size: 16px;
-    flex: 1;
-  }
-
-  .category-count {
-    font-size: 11px;
-    padding: 3px 8px;
-    white-space: nowrap;
   }
 
   .category-more {
@@ -392,79 +508,30 @@ import ToolCard from '@/components/common/ToolCard.vue'
   }
 }
 
-/* iPhone mini (375px) */
 @media (max-width: 375px) {
-  .hero-section {
-    padding: 24px 14px;
-  }
-
   .hero-title {
-    font-size: 24px;
+    font-size: 30px;
   }
 
-  .hero-desc {
-    font-size: 13px;
-  }
-
-  .hero-stats {
-    padding: 14px 10px;
+  .hero-subtitle {
+    font-size: 14px;
   }
 
   .stat-value {
-    font-size: 20px;
-  }
-
-  .stat-label {
-    font-size: 10px;
+    font-size: 18px;
   }
 
   .category-block {
     padding: 12px;
   }
-
-  .category-icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .category-title {
-    font-size: 15px;
-  }
-
-  .tools-grid {
-    gap: 8px;
-  }
 }
 
-/* iPhone Pro Max / Plus (428-430px) */
 @media (min-width: 428px) and (max-width: 430px) {
-  .hero-section {
-    padding: 32px 20px;
-  }
-
   .hero-title {
-    font-size: 28px;
-  }
-
-  .stat-value {
-    font-size: 24px;
-  }
-
-  .category-block {
-    padding: 18px;
-  }
-
-  .category-icon {
-    width: 44px;
-    height: 44px;
-  }
-
-  .tools-grid {
-    gap: 12px;
+    font-size: 38px;
   }
 }
 
-/* 横屏模式 */
 @media (max-width: 844px) and (orientation: landscape) {
   .hero-section {
     padding: 20px;
@@ -472,22 +539,7 @@ import ToolCard from '@/components/common/ToolCard.vue'
   }
 
   .hero-title {
-    font-size: 22px;
-  }
-
-  .hero-desc {
-    font-size: 13px;
-    margin-bottom: 16px;
-  }
-
-  .hero-stats {
-    flex-direction: row;
-    gap: 16px;
-    padding: 12px 16px;
-  }
-
-  .stat-value {
-    font-size: 20px;
+    font-size: 32px;
   }
 
   .tools-section {
@@ -495,7 +547,7 @@ import ToolCard from '@/components/common/ToolCard.vue'
   }
 
   .category-block {
-    padding: 12px;
+    padding: 14px;
   }
 
   .tools-grid {

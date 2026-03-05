@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { copyToClipboard } from '@/utils/clipboard'
+
+const { t } = useI18n()
 
 const length = ref(16)
 const count = ref(5)
@@ -29,7 +32,7 @@ const generatePassword = (): string => {
   if (options.value.symbols) chars += charsets.symbols
 
   if (!chars) {
-    ElMessage.warning('请至少选择一种字符类型')
+    ElMessage.warning(t('tool.password-generator.selectAtLeastOne'))
     return ''
   }
 
@@ -57,7 +60,7 @@ const copy = (text: string) => {
 
 const copyAll = () => {
   if (!passwords.value.length) return
-  copyToClipboard(passwords.value.join('\n'), '已复制全部')
+  copyToClipboard(passwords.value.join('\n'), t('tool.password-generator.copiedAll'))
 }
 
 const strength = computed(() => {
@@ -70,9 +73,9 @@ const strength = computed(() => {
   if (length.value >= 16) score++
   if (length.value >= 24) score++
 
-  if (score <= 2) return { level: '弱', color: 'danger' }
-  if (score <= 4) return { level: '中', color: 'warning' }
-  return { level: '强', color: 'success' }
+  if (score <= 2) return { level: t('tool.password-generator.weak'), color: 'danger' }
+  if (score <= 4) return { level: t('tool.password-generator.medium'), color: 'warning' }
+  return { level: t('tool.password-generator.strong'), color: 'success' }
 })
 
 // 初始化生成
@@ -82,43 +85,43 @@ generate()
 <template>
   <div class="max-w-3xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">随机密码生成</h1>
-      <p class="text-gray-500">生成安全的随机密码</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.password-generator.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.password-generator.subtitle') }}</p>
     </div>
 
     <el-card class="mb-4">
       <div class="space-y-6">
         <div class="flex items-center gap-4">
-          <span class="w-20">长度:</span>
+          <span class="w-20">{{ t('tool.password-generator.lengthLabel') }}:</span>
           <el-slider v-model="length" :min="6" :max="64" :step="1" show-input class="flex-1" />
         </div>
 
         <div class="flex items-center gap-4">
-          <span class="w-20">数量:</span>
+          <span class="w-20">{{ t('tool.password-generator.countLabel') }}:</span>
           <el-input-number v-model="count" :min="1" :max="20" />
         </div>
 
         <div class="flex flex-wrap gap-4">
-          <el-checkbox v-model="options.lowercase">小写字母 (a-z)</el-checkbox>
-          <el-checkbox v-model="options.uppercase">大写字母 (A-Z)</el-checkbox>
-          <el-checkbox v-model="options.numbers">数字 (0-9)</el-checkbox>
-          <el-checkbox v-model="options.symbols">特殊符号</el-checkbox>
+          <el-checkbox v-model="options.lowercase">{{ t('tool.password-generator.lowercase') }}</el-checkbox>
+          <el-checkbox v-model="options.uppercase">{{ t('tool.password-generator.uppercase') }}</el-checkbox>
+          <el-checkbox v-model="options.numbers">{{ t('tool.password-generator.numbers') }}</el-checkbox>
+          <el-checkbox v-model="options.symbols">{{ t('tool.password-generator.symbols') }}</el-checkbox>
         </div>
 
         <div class="flex items-center gap-4">
-          <span>密码强度:</span>
+          <span>{{ t('tool.password-generator.strengthLabel') }}:</span>
           <el-tag :type="strength.color as any">{{ strength.level }}</el-tag>
         </div>
 
         <div class="flex gap-2">
-          <el-button type="primary" @click="generate">生成密码</el-button>
-          <el-button @click="copyAll">复制全部</el-button>
+          <el-button type="primary" @click="generate">{{ t('tool.password-generator.generateBtn') }}</el-button>
+          <el-button @click="copyAll">{{ t('tool.password-generator.copyAll') }}</el-button>
         </div>
       </div>
     </el-card>
 
     <el-card>
-      <template #header>生成结果</template>
+      <template #header>{{ t('tool.password-generator.resultHeader') }}</template>
       <div class="space-y-2">
         <div
           v-for="(pwd, index) in passwords"
@@ -131,11 +134,11 @@ generate()
             class="opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0"
             @click="copy(pwd)"
           >
-            复制
+            {{ t('common.copy') }}
           </el-button>
         </div>
       </div>
-      <el-empty v-if="!passwords.length" description="点击生成密码" />
+      <el-empty v-if="!passwords.length" :description="t('tool.password-generator.emptyHint')" />
     </el-card>
   </div>
 </template>

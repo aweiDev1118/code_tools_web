@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const text1 = ref('')
 const text2 = ref('')
@@ -66,50 +69,50 @@ const loadSample = () => {
 <template>
   <div class="max-w-7xl mx-auto">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">文本对比</h1>
-      <p class="text-gray-500">对比两段文本的差异</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t('tool.text-diff.name') }}</h1>
+      <p class="text-gray-500">{{ t('tool.text-diff.subtitle') }}</p>
     </div>
 
     <div class="mb-4 flex flex-wrap gap-2">
       <el-button @click="swap">
         <el-icon><Switch /></el-icon>
-        交换
+        {{ t('tool.text-diff.swap') }}
       </el-button>
-      <el-button @click="clear">清空</el-button>
-      <el-button @click="loadSample" text>加载示例</el-button>
+      <el-button @click="clear">{{ t('common.clear') }}</el-button>
+      <el-button @click="loadSample" text>{{ t('common.loadSample') }}</el-button>
       <div class="ml-auto flex gap-2">
-        <el-tag type="danger">- {{ stats.removed }} 删除</el-tag>
-        <el-tag type="success">+ {{ stats.added }} 新增</el-tag>
-        <el-tag type="info">{{ stats.unchanged }} 相同</el-tag>
+        <el-tag type="danger">- {{ stats.removed }} {{ t('tool.text-diff.deleted') }}</el-tag>
+        <el-tag type="success">+ {{ stats.added }} {{ t('tool.text-diff.added') }}</el-tag>
+        <el-tag type="info">{{ stats.unchanged }} {{ t('tool.text-diff.unchanged') }}</el-tag>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
       <el-card>
-        <template #header>原文本</template>
+        <template #header>{{ t('tool.text-diff.originalText') }}</template>
         <el-input
           v-model="text1"
           type="textarea"
           :rows="12"
-          placeholder="请输入原文本..."
+          :placeholder="t('tool.text-diff.originalPlaceholder')"
           class="font-mono"
         />
       </el-card>
 
       <el-card>
-        <template #header>新文本</template>
+        <template #header>{{ t('tool.text-diff.newText') }}</template>
         <el-input
           v-model="text2"
           type="textarea"
           :rows="12"
-          placeholder="请输入新文本..."
+          :placeholder="t('tool.text-diff.newPlaceholder')"
           class="font-mono"
         />
       </el-card>
     </div>
 
     <el-card>
-      <template #header>对比结果</template>
+      <template #header>{{ t('tool.text-diff.diffResult') }}</template>
       <div v-if="diffLines.length" class="font-mono text-sm space-y-1 max-h-96 overflow-auto">
         <div
           v-for="(diff, index) in diffLines"
@@ -127,7 +130,7 @@ const loadSample = () => {
           {{ diff.value }}
         </div>
       </div>
-      <el-empty v-else description="输入文本后显示对比结果" />
+      <el-empty v-else :description="t('tool.text-diff.emptyHint')" />
     </el-card>
   </div>
 </template>
