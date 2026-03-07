@@ -344,6 +344,79 @@ export const tools: Tool[] = [
     keywords: ['文件', '大小', 'KB', 'MB', 'GB', '换算']
   },
 
+  // 数据工具
+  {
+    id: 'json-yaml',
+    name: 'JSON ↔ YAML',
+    description: 'JSON 与 YAML 格式互转',
+    icon: 'Switch',
+    category: 'encode',
+    keywords: ['json', 'yaml', '转换', '格式']
+  },
+  {
+    id: 'csv-tool',
+    name: 'CSV/TSV 工具',
+    description: 'CSV/TSV 解析、预览、转换',
+    icon: 'Grid',
+    category: 'text',
+    keywords: ['csv', 'tsv', '表格', '数据', '解析']
+  },
+  // 加密解密 - 新增
+  {
+    id: 'aes-encrypt',
+    name: 'AES 加密解密',
+    description: 'AES 对称加密和解密工具',
+    icon: 'Lock',
+    category: 'crypto',
+    keywords: ['aes', '加密', '解密', '对称加密', 'encrypt']
+  },
+  // 代码工具 - 新增
+  {
+    id: 'sql-formatter',
+    name: 'SQL 格式化',
+    description: 'SQL 语句格式化、美化、压缩',
+    icon: 'Tickets',
+    category: 'code',
+    keywords: ['sql', '格式化', '美化', '压缩', '数据库']
+  },
+
+  // 加密解密 - Phase 2
+  {
+    id: 'rsa-key-generator',
+    name: 'RSA 密钥生成',
+    description: '生成 RSA 公钥/私钥对',
+    icon: 'Key',
+    category: 'crypto',
+    keywords: ['rsa', '密钥', '公钥', '私钥', '非对称加密', 'key']
+  },
+  // 颜色工具 - Phase 2
+  {
+    id: 'color-palette',
+    name: '调色板生成',
+    description: '从基础色生成完整调色板',
+    icon: 'Brush',
+    category: 'color',
+    keywords: ['调色板', '配色', '颜色', 'palette', '色板']
+  },
+  // 代码工具 - Phase 2
+  {
+    id: 'json-schema',
+    name: 'JSON Schema',
+    description: '从 JSON 生成 JSON Schema 定义',
+    icon: 'Connection',
+    category: 'code',
+    keywords: ['json', 'schema', '验证', '定义', 'draft']
+  },
+  // 生成器 - Phase 2
+  {
+    id: 'emoji-picker',
+    name: 'Emoji 选择器',
+    description: 'Emoji 表情搜索与复制',
+    icon: 'StarFilled',
+    category: 'generator',
+    keywords: ['emoji', '表情', '符号', '颜文字', 'emoticon']
+  },
+
   // 开发辅助
   {
     id: 'http-status-codes',

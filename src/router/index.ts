@@ -209,6 +209,27 @@ const routes: RouteRecordRaw[] = [
     name: 'MimeTypes',
     component: () => import('@/views/tools/MimeTypes.vue')
   },
+  // v2.0 新增工具
+  {
+    path: '/tool/json-yaml',
+    name: 'JsonYaml',
+    component: () => import('@/views/tools/JsonYaml.vue')
+  },
+  {
+    path: '/tool/aes-encrypt',
+    name: 'AesEncrypt',
+    component: () => import('@/views/tools/AesEncrypt.vue')
+  },
+  {
+    path: '/tool/csv-tool',
+    name: 'CsvTool',
+    component: () => import('@/views/tools/CsvTool.vue')
+  },
+  {
+    path: '/tool/sql-formatter',
+    name: 'SqlFormatter',
+    component: () => import('@/views/tools/SqlFormatter.vue')
+  },
   // 新增文本/代码/颜色/日期/生成器
   {
     path: '/tool/text-dedup',
@@ -234,6 +255,27 @@ const routes: RouteRecordRaw[] = [
     path: '/tool/lorem-ipsum',
     name: 'LoremIpsum',
     component: () => import('@/views/tools/LoremIpsum.vue')
+  },
+  // Phase 2 新增工具
+  {
+    path: '/tool/rsa-key-generator',
+    name: 'RsaKeyGenerator',
+    component: () => import('@/views/tools/RsaKeyGenerator.vue')
+  },
+  {
+    path: '/tool/color-palette',
+    name: 'ColorPalette',
+    component: () => import('@/views/tools/ColorPalette.vue')
+  },
+  {
+    path: '/tool/json-schema',
+    name: 'JsonSchema',
+    component: () => import('@/views/tools/JsonSchema.vue')
+  },
+  {
+    path: '/tool/emoji-picker',
+    name: 'EmojiPicker',
+    component: () => import('@/views/tools/EmojiPicker.vue')
   },
 ]
 

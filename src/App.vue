@@ -3,6 +3,7 @@ import { ref, provide, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppSidebar from './components/layout/AppSidebar.vue'
+import CommandPalette from './components/CommandPalette.vue'
 import { useHistory } from '@/composables/useHistory'
 import { useSeo } from '@/composables/useSeo'
 
@@ -22,6 +23,8 @@ watch(
 )
 
 type ThemeMode = 'light' | 'dark' | 'system'
+
+const commandPaletteVisible = ref(false)
 
 const themeMode = ref<ThemeMode>((localStorage.getItem('themeMode') as ThemeMode) || 'system')
 const isDark = ref(false)
@@ -80,8 +83,16 @@ const handleResize = () => {
   }
 }
 
+const handleKeydown = (e: KeyboardEvent) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault()
+    commandPaletteVisible.value = !commandPaletteVisible.value
+  }
+}
+
 onMounted(() => {
   window.addEventListener('resize', handleResize)
+  window.addEventListener('keydown', handleKeydown)
   applyTheme(themeMode.value)
   // 初始化时如果是移动端，隐藏侧边栏
   if (isMobile.value) {
@@ -91,6 +102,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  window.removeEventListener('keydown', handleKeydown)
   systemDarkQuery.removeEventListener('change', handleSystemThemeChange)
 })
 
@@ -134,6 +146,7 @@ provide('closeSidebar', closeSidebar)
         </transition>
       </router-view>
     </main>
+    <CommandPalette v-model:visible="commandPaletteVisible" />
   </div>
 </template>
 
