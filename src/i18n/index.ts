@@ -36,18 +36,20 @@ function mergeToolMessages(
 
 const savedLocale = (localStorage.getItem('locale') as LocaleKey) || 'zh-CN'
 
+const messages = {
+  'zh-CN': mergeToolMessages(zhCN, toolsGroup1['zh-CN'], toolsGroup2['zh-CN'], toolsGroup3['zh-CN']),
+  'zh-TW': mergeToolMessages(zhTW, toolsGroup1['zh-TW'], toolsGroup2['zh-TW'], toolsGroup3['zh-TW']),
+  en: mergeToolMessages(en, toolsGroup1['en'], toolsGroup2['en'], toolsGroup3['en']),
+  ja: mergeToolMessages(ja, toolsGroup1['ja'], toolsGroup2['ja'], toolsGroup3['ja']),
+  ko: mergeToolMessages(ko, toolsGroup1['ko'], toolsGroup2['ko'], toolsGroup3['ko']),
+  vi: mergeToolMessages(vi, toolsGroup1['vi'], toolsGroup2['vi'], toolsGroup3['vi']),
+}
+
 const i18n = createI18n({
   legacy: false,
   locale: savedLocale,
   fallbackLocale: 'zh-CN',
-  messages: {
-    'zh-CN': mergeToolMessages(zhCN, toolsGroup1['zh-CN'], toolsGroup2['zh-CN'], toolsGroup3['zh-CN']),
-    'zh-TW': mergeToolMessages(zhTW, toolsGroup1['zh-TW'], toolsGroup2['zh-TW'], toolsGroup3['zh-TW']),
-    en: mergeToolMessages(en, toolsGroup1['en'], toolsGroup2['en'], toolsGroup3['en']),
-    ja: mergeToolMessages(ja, toolsGroup1['ja'], toolsGroup2['ja'], toolsGroup3['ja']),
-    ko: mergeToolMessages(ko, toolsGroup1['ko'], toolsGroup2['ko'], toolsGroup3['ko']),
-    vi: mergeToolMessages(vi, toolsGroup1['vi'], toolsGroup2['vi'], toolsGroup3['vi']),
-  },
+  messages: messages as any,
 })
 
 export function setLocale(locale: LocaleKey) {
