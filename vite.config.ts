@@ -59,7 +59,7 @@ export default defineConfig({
     }
   },
   server: {
-    port: 6001,
+    port: 9001,
     open: true
   },
   build: {
