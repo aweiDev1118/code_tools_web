@@ -41,6 +41,7 @@ export default {
     categories: 'Danh mục',
     allTools: 'Tất cả công cụ',
     changelog: 'Nhật ký thay đổi',
+    contactMe: 'Liên hệ',
   },
   home: {
     title: 'DevToolbox',
@@ -156,6 +157,7 @@ export default {
         feat8: 'Thêm Emoji Picker (8 danh mục, tìm kiếm đa ngôn ngữ)',
         feat9: 'Thêm bảng lệnh toàn cục Cmd+K / Ctrl+K',
         feat10: 'Thêm trang nhật ký thay đổi',
+        feat11: 'Thêm liên kết liên hệ qua email',
         perf1: 'Hỗ trợ PWA ngoại tuyến + nén Gzip',
       },
       v110: {

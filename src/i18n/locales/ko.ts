@@ -41,6 +41,7 @@ export default {
     categories: '카테고리',
     allTools: '모든 도구',
     changelog: '변경 이력',
+    contactMe: '문의하기',
   },
   home: {
     title: 'DevToolbox',
@@ -156,6 +157,7 @@ export default {
         feat8: 'Emoji 선택기 추가 (8개 카테고리, 다국어 검색)',
         feat9: 'Cmd+K / Ctrl+K 글로벌 명령 팔레트 추가',
         feat10: '변경 이력 페이지 추가',
+        feat11: '이메일 연락처 링크 추가',
         perf1: 'PWA 오프라인 지원 + Gzip 압축 최적화',
       },
       v110: {

@@ -157,6 +157,10 @@ const isCategoryActive = (categoryId: string) =>
 
     <!-- Footer -->
     <div v-if="!collapsed || isMobile" class="sidebar-footer">
+      <a href="mailto:jingwei.wang.ww@gmail.com" class="contact-link">
+        <el-icon size="12"><Message /></el-icon>
+        {{ t('nav.contactMe') }}
+      </a>
       <span class="version-badge">
         <el-icon size="11"><InfoFilled /></el-icon>
         {{ t('common.version') }} 0.1.0
@@ -525,6 +529,10 @@ const isCategoryActive = (categoryId: string) =>
 
 /* ── Footer ── */
 .sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 10px 12px 12px;
   border-top: 0.5px solid rgba(0, 0, 0, 0.06);
   background: transparent;
@@ -546,6 +554,37 @@ const isCategoryActive = (categoryId: string) =>
   border-radius: 100px;
   border: 0.5px solid rgba(0, 0, 0, 0.06);
   background: transparent;
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6366f1;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 100px;
+  border: 0.5px solid rgba(99, 102, 241, 0.15);
+  background: rgba(99, 102, 241, 0.04);
+  transition: all 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.contact-link:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.dark .contact-link {
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.15);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.dark .contact-link:hover {
+  background: rgba(99, 102, 241, 0.14);
+  border-color: rgba(99, 102, 241, 0.3);
 }
 
 .dark .version-badge {

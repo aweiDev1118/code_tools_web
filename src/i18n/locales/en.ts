@@ -41,6 +41,7 @@ export default {
     categories: 'Categories',
     allTools: 'All Tools',
     changelog: 'Changelog',
+    contactMe: 'Contact Me',
   },
   home: {
     title: 'DevToolbox',
@@ -156,6 +157,7 @@ export default {
         feat8: 'Added Emoji picker (8 categories, bilingual search)',
         feat9: 'Added Cmd+K / Ctrl+K global command palette',
         feat10: 'Added changelog page',
+        feat11: 'Added email contact link',
         perf1: 'PWA offline support + Gzip compression',
       },
       v110: {

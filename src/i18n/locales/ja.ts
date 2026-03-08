@@ -41,6 +41,7 @@ export default {
     categories: 'カテゴリ',
     allTools: 'すべてのツール',
     changelog: '更新履歴',
+    contactMe: 'お問い合わせ',
   },
   home: {
     title: 'DevToolbox',
@@ -156,6 +157,7 @@ export default {
         feat8: 'Emoji ピッカーを追加（8 カテゴリ、多言語検索）',
         feat9: 'Cmd+K / Ctrl+K グローバルコマンドパレットを追加',
         feat10: '更新履歴ページを追加',
+        feat11: 'メール連絡先リンクを追加',
         perf1: 'PWA オフラインサポート + Gzip 圧縮最適化',
       },
       v110: {

@@ -33,6 +33,7 @@ const changelog: readonly ChangelogEntry[] = [
           t('changelog.entries.v200.feat8'),
           t('changelog.entries.v200.feat9'),
           t('changelog.entries.v200.feat10'),
+          t('changelog.entries.v200.feat11'),
         ],
       },
       {

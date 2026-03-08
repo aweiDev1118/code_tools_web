@@ -41,6 +41,7 @@ export default {
     categories: '工具分类',
     allTools: '所有工具',
     changelog: '更新日志',
+    contactMe: '联系我',
   },
   home: {
     title: 'DevToolbox',
@@ -156,6 +157,7 @@ export default {
         feat8: '新增 Emoji 表情选择器（8 大分类、中英文搜索）',
         feat9: '新增 Cmd+K / Ctrl+K 全局命令面板',
         feat10: '新增更新日志页面',
+        feat11: '新增邮箱联系入口',
         perf1: 'PWA 离线支持 + Gzip 压缩优化',
       },
       v110: {
