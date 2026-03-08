@@ -92,6 +92,18 @@ const isCategoryActive = (categoryId: string) =>
           <span v-if="!collapsed || isMobile" class="nav-label">{{ t('nav.history') }}</span>
           <span v-if="(!collapsed || isMobile) && route.path === '/history'" class="active-pip"></span>
         </div>
+
+        <div
+          class="nav-item"
+          :class="{ active: route.path === '/changelog' }"
+          @click="goTo('/changelog')"
+        >
+          <span class="nav-icon-wrap">
+            <el-icon size="15"><List /></el-icon>
+          </span>
+          <span v-if="!collapsed || isMobile" class="nav-label">{{ t('nav.changelog') }}</span>
+          <span v-if="(!collapsed || isMobile) && route.path === '/changelog'" class="active-pip"></span>
+        </div>
       </nav>
 
       <!-- Divider with categories label -->

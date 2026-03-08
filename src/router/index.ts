@@ -23,6 +23,11 @@ const routes: RouteRecordRaw[] = [
     name: 'History',
     component: () => import('@/views/HistoryView.vue')
   },
+  {
+    path: '/changelog',
+    name: 'Changelog',
+    component: () => import('@/views/ChangelogView.vue')
+  },
   // 文本工具
   {
     path: '/tool/json-formatter',
