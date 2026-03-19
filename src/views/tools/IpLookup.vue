@@ -52,7 +52,7 @@ const fetchMyIp = async () => {
     const data = await tryFetchJson([
       'https://api.ipify.org/?format=json',
       'https://api.ip.sb/jsonip',
-      'https://ipwho.is/',
+      'https://ipinfo.io/json',
     ])
     const detectedIp = data?.ip as string | undefined
     if (detectedIp) {
@@ -68,24 +68,8 @@ const fetchMyIp = async () => {
   }
 }
 
-const parseIpApiCom = (data: Record<string, unknown>): IpInfo => ({
-  ip: (data.query as string) || '',
-  country: (data.country as string) || '',
-  countryCode: (data.countryCode as string) || '',
-  region: (data.region as string) || '',
-  regionName: (data.regionName as string) || '',
-  city: (data.city as string) || '',
-  zip: (data.zip as string) || '',
-  lat: (data.lat as number) || 0,
-  lon: (data.lon as number) || 0,
-  timezone: (data.timezone as string) || '',
-  isp: (data.isp as string) || '',
-  org: (data.org as string) || '',
-  as: (data.as as string) || '',
-})
-
-const parseIpwhois = (data: Record<string, unknown>): IpInfo => ({
-  ip: (data.ip as string) || '',
+const parseIpSb = (data: Record<string, unknown>, targetIp: string): IpInfo => ({
+  ip: (data.ip as string) || targetIp,
   country: (data.country as string) || '',
   countryCode: (data.country_code as string) || '',
   region: (data.region_code as string) || '',
@@ -94,25 +78,68 @@ const parseIpwhois = (data: Record<string, unknown>): IpInfo => ({
   zip: (data.postal as string) || '',
   lat: (data.latitude as number) || 0,
   lon: (data.longitude as number) || 0,
-  timezone: ((data.timezone as Record<string, unknown>)?.id as string) || '',
+  timezone: (data.timezone as string) || '',
   isp: (data.isp as string) || '',
-  org: (data.org as string) || '',
-  as: (data.asn as string) ? `${data.asn} ${data.org}` : '',
+  org: (data.organization as string) || '',
+  as: (data.asn_organization as string) ? `${data.asn} ${data.asn_organization}` : '',
+})
+
+const parseIpInfo = (data: Record<string, unknown>, targetIp: string): IpInfo => {
+  const loc = (data.loc as string) || ''
+  const [lat, lon] = loc.split(',').map(Number)
+  return {
+    ip: (data.ip as string) || targetIp,
+    country: (data.country as string) || '',
+    countryCode: (data.country as string) || '',
+    region: (data.region as string) || '',
+    regionName: (data.region as string) || '',
+    city: (data.city as string) || '',
+    zip: (data.postal as string) || '',
+    lat: lat || 0,
+    lon: lon || 0,
+    timezone: (data.timezone as string) || '',
+    isp: (data.org as string) || '',
+    org: (data.org as string) || '',
+    as: '',
+  }
+}
+
+const parseFreeIpApi = (data: Record<string, unknown>, targetIp: string): IpInfo => ({
+  ip: (data.ipAddress as string) || targetIp,
+  country: (data.countryName as string) || '',
+  countryCode: (data.countryCode as string) || '',
+  region: (data.regionName as string) || '',
+  regionName: (data.regionName as string) || '',
+  city: (data.cityName as string) || '',
+  zip: (data.zipCode as string) || '',
+  lat: (data.latitude as number) || 0,
+  lon: (data.longitude as number) || 0,
+  timezone: (data.timeZone as string) || '',
+  isp: '',
+  org: '',
+  as: '',
 })
 
 const fetchIpInfo = async (targetIp: string) => {
   try {
-    // Provider 1: ip-api.com (free, globally accessible, HTTP only)
-    const data1 = await tryFetchJson([`http://ip-api.com/json/${targetIp}`])
-    if (data1 && data1.status === 'success') {
-      ipInfo.value = parseIpApiCom(data1)
+    // Provider 1: api.ip.sb (HTTPS, China-friendly)
+    const data1 = await tryFetchJson([`https://api.ip.sb/geoip/${targetIp}`])
+    if (data1 && data1.ip) {
+      ipInfo.value = parseIpSb(data1, targetIp)
       return
     }
 
-    // Provider 2: ipwho.is (HTTPS, globally accessible)
-    const data2 = await tryFetchJson([`https://ipwho.is/${targetIp}`])
-    if (data2 && data2.success !== false) {
-      ipInfo.value = parseIpwhois(data2)
+    // Provider 2: ipinfo.io (HTTPS, globally accessible)
+    const data2 = await tryFetchJson([`https://ipinfo.io/${targetIp}/json`])
+    if (data2 && !data2.error) {
+      ipInfo.value = parseIpInfo(data2, targetIp)
+      return
+    }
+
+    // Provider 3: freeipapi.com (HTTPS, globally accessible)
+    const data3 = await tryFetchJson([`https://freeipapi.com/api/json/${targetIp}`])
+    if (data3 && data3.ipAddress) {
+      ipInfo.value = parseFreeIpApi(data3, targetIp)
       return
     }
 
