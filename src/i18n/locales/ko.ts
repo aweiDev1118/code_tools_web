@@ -149,7 +149,7 @@ export default {
       v201: {
         fix1: 'IP 조회 도구를 다중 제공자 fallback으로 변경 (중국에서도 접속 가능)',
         fix2: 'IP 위치 조회를 ip-api.com + ipwho.is 이중 소스로 전환',
-        fix3: '지도 미리보기를 Google Maps에서 OpenStreetMap으로 변경',
+        fix3: '지도 미리보기에서 Google Maps / 가오더 지도 / OpenStreetMap 전환 지원',
       },
       v200: {
         feat1: 'JSON ↔ YAML 양방향 변환 도구 추가',

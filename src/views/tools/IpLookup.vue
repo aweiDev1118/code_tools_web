@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { copyToClipboard } from '@/utils/clipboard'
 
@@ -26,6 +26,31 @@ const ip = ref('')
 const ipInfo = ref<IpInfo | null>(null)
 const errorMsg = ref('')
 const queryIp = ref('')
+const amapKey = import.meta.env.VITE_AMAP_KEY || ''
+const mapProvider = ref<'google' | 'amap' | 'osm'>('google')
+const amapSupportsIframe = computed(() => !!amapKey)
+
+const mapIframeSrc = computed(() => {
+  if (!ipInfo.value) return ''
+  const { lat, lon } = ipInfo.value
+  switch (mapProvider.value) {
+    case 'amap':
+      return amapKey
+        ? `https://m.amap.com/navi/?dest=${lon},${lat}&destName=IP&hideRouteIcon=1&key=${amapKey}`
+        : ''
+    case 'osm':
+      return `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.5},${lat - 0.3},${lon + 0.5},${lat + 0.3}&layer=mapnik&marker=${lat},${lon}`
+    case 'google':
+    default:
+      return `https://maps.google.com/maps?q=${lat},${lon}&z=10&output=embed`
+  }
+})
+
+const amapExternalUrl = computed(() => {
+  if (!ipInfo.value) return ''
+  const { lat, lon, ip: ipAddr } = ipInfo.value
+  return `https://uri.amap.com/marker?position=${lon},${lat}&name=IP:${ipAddr}`
+})
 
 const fetchWithTimeout = (url: string, timeoutMs = 5000): Promise<Response> => {
   const controller = new AbortController()
@@ -325,7 +350,7 @@ onMounted(() => {
         </el-card>
       </div>
 
-      <!-- 在地图中查看 -->
+      <!-- 地图预览 -->
       <el-card v-if="ipInfo && ipInfo.lat && ipInfo.lon" class="mt-4">
         <template #header>
           <div class="card-header">
@@ -333,34 +358,48 @@ onMounted(() => {
             <span>{{ t('tool.ip-lookup.locationPreview') }}</span>
           </div>
         </template>
-        <div class="map-links">
-          <a
-            :href="`https://uri.amap.com/marker?position=${ipInfo.lon},${ipInfo.lat}&name=IP: ${ipInfo.ip}`"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="map-link-btn amap"
-          >
-            <el-icon><Position /></el-icon>
-            {{ t('tool.ip-lookup.openAmap') }}
-          </a>
-          <a
-            :href="`https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}`"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="map-link-btn google"
-          >
-            <el-icon><Position /></el-icon>
-            {{ t('tool.ip-lookup.openGoogle') }}
-          </a>
-          <a
-            :href="`https://www.openstreetmap.org/?mlat=${ipInfo.lat}&mlon=${ipInfo.lon}#map=12/${ipInfo.lat}/${ipInfo.lon}`"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="map-link-btn osm"
-          >
-            <el-icon><Position /></el-icon>
-            OpenStreetMap
-          </a>
+        <div class="map-provider-bar">
+          <div class="map-tabs">
+            <button
+              class="map-tab"
+              :class="{ active: mapProvider === 'google' }"
+              @click="mapProvider = 'google'"
+            >Google Maps</button>
+            <button
+              v-if="amapSupportsIframe"
+              class="map-tab"
+              :class="{ active: mapProvider === 'amap' }"
+              @click="mapProvider = 'amap'"
+            >{{ t('tool.ip-lookup.openAmap') }}</button>
+            <button
+              class="map-tab"
+              :class="{ active: mapProvider === 'osm' }"
+              @click="mapProvider = 'osm'"
+            >OpenStreetMap</button>
+            <a
+              v-if="!amapSupportsIframe"
+              :href="amapExternalUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="map-tab amap-link"
+            >
+              {{ t('tool.ip-lookup.openAmap') }}
+              <el-icon size="11"><TopRight /></el-icon>
+            </a>
+          </div>
+          <span class="map-hint">{{ t('tool.ip-lookup.mapHint') }}</span>
+        </div>
+        <div class="map-container">
+          <iframe
+            :key="mapProvider"
+            :src="mapIframeSrc"
+            width="100%"
+            height="300"
+            style="border: 0; border-radius: 8px;"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
         </div>
       </el-card>
     </template>
@@ -487,56 +526,94 @@ onMounted(() => {
   color: #f3f4f6;
 }
 
-.map-links {
+.map-provider-bar {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
-.map-link-btn {
+.map-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.dark .map-tabs {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.map-tab {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: #6b7280;
+  transition: all 0.16s ease;
+}
+
+.map-tab:hover {
+  color: #374151;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.map-tab.active {
+  background: #ffffff;
+  color: #6366f1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .map-tab {
+  color: #9ca3af;
+}
+
+.dark .map-tab:hover {
+  color: #e5e7eb;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dark .map-tab.active {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  box-shadow: none;
+}
+
+.map-tab.amap-link {
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 20px;
+  gap: 3px;
+  color: #6b7280;
+}
+
+.map-tab.amap-link:hover {
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.dark .map-tab.amap-link:hover {
+  color: #a5b4fc;
+}
+
+.map-hint {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.dark .map-hint {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.map-container {
   border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.16s ease;
-  border: 1px solid;
-}
-
-.map-link-btn.amap {
-  color: #1677ff;
-  background: rgba(22, 119, 255, 0.06);
-  border-color: rgba(22, 119, 255, 0.2);
-}
-
-.map-link-btn.amap:hover {
-  background: rgba(22, 119, 255, 0.12);
-  border-color: rgba(22, 119, 255, 0.4);
-}
-
-.map-link-btn.google {
-  color: #ea4335;
-  background: rgba(234, 67, 53, 0.06);
-  border-color: rgba(234, 67, 53, 0.2);
-}
-
-.map-link-btn.google:hover {
-  background: rgba(234, 67, 53, 0.12);
-  border-color: rgba(234, 67, 53, 0.4);
-}
-
-.map-link-btn.osm {
-  color: #7ebc6f;
-  background: rgba(126, 188, 111, 0.06);
-  border-color: rgba(126, 188, 111, 0.2);
-}
-
-.map-link-btn.osm:hover {
-  background: rgba(126, 188, 111, 0.12);
-  border-color: rgba(126, 188, 111, 0.4);
+  overflow: hidden;
 }
 
 /* 移动端适配 */

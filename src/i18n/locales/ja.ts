@@ -149,7 +149,7 @@ export default {
       v201: {
         fix1: 'IP 検索ツールをマルチプロバイダ fallback に変更（中国からもアクセス可能）',
         fix2: 'IP 位置情報を ip-api.com + ipwho.is デュアルソースに切替',
-        fix3: '地図プレビューを Google Maps から OpenStreetMap に変更',
+        fix3: '地図プレビューで Google Maps / 高德地図 / OpenStreetMap の切替に対応',
       },
       v200: {
         feat1: 'JSON ↔ YAML 双方向変換ツールを追加',

@@ -149,7 +149,7 @@ export default {
       v201: {
         fix1: 'IP 查询工具替换为多源 fallback（支持中国网络环境）',
         fix2: 'IP 归属地查询切换为 ip-api.com + ipwho.is 双源',
-        fix3: '地图预览从 Google Maps 替换为 OpenStreetMap',
+        fix3: '地图预览支持 Google Maps / 高德地图 / OpenStreetMap 三源切换',
       },
       v200: {
         feat1: '新增 JSON ↔ YAML 双向转换工具',

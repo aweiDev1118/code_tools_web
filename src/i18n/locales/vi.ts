@@ -149,7 +149,7 @@ export default {
       v201: {
         fix1: 'Công cụ tra cứu IP chuyển sang multi-provider fallback (hoạt động tại Trung Quốc)',
         fix2: 'Tra cứu vị trí IP chuyển sang ip-api.com + ipwho.is nguồn kép',
-        fix3: 'Xem trước bản đồ thay Google Maps bằng OpenStreetMap',
+        fix3: 'Xem trước bản đồ hỗ trợ chuyển đổi Google Maps / Amap / OpenStreetMap',
       },
       v200: {
         feat1: 'Thêm công cụ chuyển đổi JSON ↔ YAML hai chiều',
