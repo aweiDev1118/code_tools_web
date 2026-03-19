@@ -150,10 +150,11 @@ const downloadSingleImage = (dataUrl: string, index: number) => {
   link.click()
 }
 
-const downloadAllImages = () => {
-  pdfPageImages.value.forEach((dataUrl, index) => {
-    downloadSingleImage(dataUrl, index)
-  })
+const downloadAllImages = async () => {
+  for (let i = 0; i < pdfPageImages.value.length; i++) {
+    downloadSingleImage(pdfPageImages.value[i], i)
+    await new Promise(r => setTimeout(r, 300))
+  }
   ElMessage.success(t('tool.pdf-converter.downloadAllSuccess'))
 }
 
