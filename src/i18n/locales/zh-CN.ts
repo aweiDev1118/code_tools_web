@@ -146,6 +146,11 @@ export default {
       docs: '文档',
     },
     entries: {
+      v201: {
+        fix1: 'IP 查询工具替换为多源 fallback（支持中国网络环境）',
+        fix2: 'IP 归属地查询切换为 ip-api.com + ipwho.is 双源',
+        fix3: '地图预览从 Google Maps 替换为 OpenStreetMap',
+      },
       v200: {
         feat1: '新增 JSON ↔ YAML 双向转换工具',
         feat2: '新增 AES 加密解密工具（支持 CBC/ECB/CTR 模式）',

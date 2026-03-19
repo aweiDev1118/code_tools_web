@@ -27,49 +27,97 @@ const ipInfo = ref<IpInfo | null>(null)
 const errorMsg = ref('')
 const queryIp = ref('')
 
+const fetchWithTimeout = (url: string, timeoutMs = 5000): Promise<Response> => {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer))
+}
+
+const tryFetchJson = async (urls: string[]): Promise<Record<string, unknown> | null> => {
+  for (const url of urls) {
+    try {
+      const res = await fetchWithTimeout(url)
+      if (res.ok) return await res.json()
+    } catch {
+      // try next provider
+    }
+  }
+  return null
+}
+
 const fetchMyIp = async () => {
   loading.value = true
   errorMsg.value = ''
   try {
-    const response = await fetch('https://api.ipify.org/?format=json')
-    if (!response.ok) throw new Error('request failed')
-    const data = await response.json()
-    if (data && data.ip) {
-      ip.value = data.ip
-      await fetchIpInfo(data.ip)
+    const data = await tryFetchJson([
+      'https://api.ipify.org/?format=json',
+      'https://api.ip.sb/jsonip',
+      'https://ipwho.is/',
+    ])
+    const detectedIp = data?.ip as string | undefined
+    if (detectedIp) {
+      ip.value = detectedIp
+      await fetchIpInfo(detectedIp)
+    } else {
+      errorMsg.value = t('tool.ip-lookup.fetchError')
+      loading.value = false
     }
-  } catch (e) {
+  } catch {
     errorMsg.value = t('tool.ip-lookup.fetchError')
     loading.value = false
   }
 }
 
+const parseIpApiCom = (data: Record<string, unknown>): IpInfo => ({
+  ip: (data.query as string) || '',
+  country: (data.country as string) || '',
+  countryCode: (data.countryCode as string) || '',
+  region: (data.region as string) || '',
+  regionName: (data.regionName as string) || '',
+  city: (data.city as string) || '',
+  zip: (data.zip as string) || '',
+  lat: (data.lat as number) || 0,
+  lon: (data.lon as number) || 0,
+  timezone: (data.timezone as string) || '',
+  isp: (data.isp as string) || '',
+  org: (data.org as string) || '',
+  as: (data.as as string) || '',
+})
+
+const parseIpwhois = (data: Record<string, unknown>): IpInfo => ({
+  ip: (data.ip as string) || '',
+  country: (data.country as string) || '',
+  countryCode: (data.country_code as string) || '',
+  region: (data.region_code as string) || '',
+  regionName: (data.region as string) || '',
+  city: (data.city as string) || '',
+  zip: (data.postal as string) || '',
+  lat: (data.latitude as number) || 0,
+  lon: (data.longitude as number) || 0,
+  timezone: ((data.timezone as Record<string, unknown>)?.id as string) || '',
+  isp: (data.isp as string) || '',
+  org: (data.org as string) || '',
+  as: (data.asn as string) ? `${data.asn} ${data.org}` : '',
+})
+
 const fetchIpInfo = async (targetIp: string) => {
   try {
-    const response = await fetch(`https://ipapi.co/${targetIp}/json/`)
-    if (!response.ok) throw new Error('query failed')
-    const data = await response.json()
-
-    if (data.error) {
-      errorMsg.value = data.reason || t('tool.ip-lookup.queryError')
-    } else {
-      ipInfo.value = {
-        ip: data.ip,
-        country: data.country_name || '',
-        countryCode: data.country_code || '',
-        region: data.region_code || '',
-        regionName: data.region || '',
-        city: data.city || '',
-        zip: data.postal || '',
-        lat: data.latitude || 0,
-        lon: data.longitude || 0,
-        timezone: data.timezone || '',
-        isp: data.org || '',
-        org: data.org || '',
-        as: data.asn ? `${data.asn} ${data.org}` : ''
-      }
+    // Provider 1: ip-api.com (free, globally accessible, HTTP only)
+    const data1 = await tryFetchJson([`http://ip-api.com/json/${targetIp}`])
+    if (data1 && data1.status === 'success') {
+      ipInfo.value = parseIpApiCom(data1)
+      return
     }
-  } catch (e) {
+
+    // Provider 2: ipwho.is (HTTPS, globally accessible)
+    const data2 = await tryFetchJson([`https://ipwho.is/${targetIp}`])
+    if (data2 && data2.success !== false) {
+      ipInfo.value = parseIpwhois(data2)
+      return
+    }
+
+    errorMsg.value = t('tool.ip-lookup.queryError')
+  } catch {
     // geo query failure does not affect IP display
   } finally {
     loading.value = false
@@ -260,7 +308,7 @@ onMounted(() => {
         </template>
         <div class="map-container">
           <iframe
-            :src="`https://maps.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}&z=10&output=embed`"
+            :src="`https://www.openstreetmap.org/export/embed.html?bbox=${ipInfo.lon - 0.5},${ipInfo.lat - 0.3},${ipInfo.lon + 0.5},${ipInfo.lat + 0.3}&layer=mapnik&marker=${ipInfo.lat},${ipInfo.lon}`"
             width="100%"
             height="300"
             style="border: 0; border-radius: 8px;"

@@ -146,6 +146,11 @@ export default {
       docs: 'Tài liệu',
     },
     entries: {
+      v201: {
+        fix1: 'Công cụ tra cứu IP chuyển sang multi-provider fallback (hoạt động tại Trung Quốc)',
+        fix2: 'Tra cứu vị trí IP chuyển sang ip-api.com + ipwho.is nguồn kép',
+        fix3: 'Xem trước bản đồ thay Google Maps bằng OpenStreetMap',
+      },
       v200: {
         feat1: 'Thêm công cụ chuyển đổi JSON ↔ YAML hai chiều',
         feat2: 'Thêm công cụ mã hóa/giải mã AES (chế độ CBC/ECB/CTR)',

@@ -146,6 +146,11 @@ export default {
       docs: 'Docs',
     },
     entries: {
+      v201: {
+        fix1: 'IP lookup tool now uses multi-provider fallback (works in China)',
+        fix2: 'IP geolocation switched to ip-api.com + ipwho.is dual providers',
+        fix3: 'Map preview replaced Google Maps with OpenStreetMap',
+      },
       v200: {
         feat1: 'Added JSON ↔ YAML bidirectional converter',
         feat2: 'Added AES encrypt/decrypt tool (CBC/ECB/CTR modes)',
