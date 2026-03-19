@@ -19,6 +19,7 @@ const activeTab = ref('pdf-to-images')
 
 // ==================== Tab 1: PDF → Images ====================
 const pdfPageImages = ref<string[]>([])
+const pdfFileName = ref('')
 const pdfToImgLoading = ref(false)
 const imgOutputFormat = ref<'png' | 'jpeg'>('png')
 const imgScale = ref(2)
@@ -104,6 +105,7 @@ const handlePdfToImages = async (uploadFile: { raw: File }) => {
 
   pdfToImgLoading.value = true
   pdfPageImages.value = []
+  pdfFileName.value = file.name.replace(/\.pdf$/i, '')
 
   try {
     const arrayBuffer = await readFileAsArrayBuffer(file)
@@ -144,8 +146,9 @@ const handlePdfToImages = async (uploadFile: { raw: File }) => {
 
 const downloadSingleImage = (dataUrl: string, index: number) => {
   const ext = imgOutputFormat.value === 'jpeg' ? 'jpg' : 'png'
+  const baseName = pdfFileName.value || 'page'
   const link = document.createElement('a')
-  link.download = `page-${index + 1}.${ext}`
+  link.download = `${baseName}_p${index + 1}.${ext}`
   link.href = dataUrl
   link.click()
 }
