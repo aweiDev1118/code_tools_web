@@ -8,6 +8,7 @@ import vi from './locales/vi'
 import toolsGroup1 from './locales/_tools_group1'
 import toolsGroup2 from './locales/_tools_group2'
 import toolsGroup3 from './locales/_tools_group3'
+import toolsGroup4 from './locales/_tools_group4'
 
 export type LocaleKey = 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'ko' | 'vi'
 
@@ -37,12 +38,12 @@ function mergeToolMessages(
 const savedLocale = (localStorage.getItem('locale') as LocaleKey) || 'zh-CN'
 
 const messages = {
-  'zh-CN': mergeToolMessages(zhCN, toolsGroup1['zh-CN'], toolsGroup2['zh-CN'], toolsGroup3['zh-CN']),
-  'zh-TW': mergeToolMessages(zhTW, toolsGroup1['zh-TW'], toolsGroup2['zh-TW'], toolsGroup3['zh-TW']),
-  en: mergeToolMessages(en, toolsGroup1['en'], toolsGroup2['en'], toolsGroup3['en']),
-  ja: mergeToolMessages(ja, toolsGroup1['ja'], toolsGroup2['ja'], toolsGroup3['ja']),
-  ko: mergeToolMessages(ko, toolsGroup1['ko'], toolsGroup2['ko'], toolsGroup3['ko']),
-  vi: mergeToolMessages(vi, toolsGroup1['vi'], toolsGroup2['vi'], toolsGroup3['vi']),
+  'zh-CN': mergeToolMessages(zhCN, toolsGroup1['zh-CN'], toolsGroup2['zh-CN'], toolsGroup3['zh-CN'], toolsGroup4['zh-CN']),
+  'zh-TW': mergeToolMessages(zhTW, toolsGroup1['zh-TW'], toolsGroup2['zh-TW'], toolsGroup3['zh-TW'], toolsGroup4['zh-TW']),
+  en: mergeToolMessages(en, toolsGroup1['en'], toolsGroup2['en'], toolsGroup3['en'], toolsGroup4['en']),
+  ja: mergeToolMessages(ja, toolsGroup1['ja'], toolsGroup2['ja'], toolsGroup3['ja'], toolsGroup4['ja']),
+  ko: mergeToolMessages(ko, toolsGroup1['ko'], toolsGroup2['ko'], toolsGroup3['ko'], toolsGroup4['ko']),
+  vi: mergeToolMessages(vi, toolsGroup1['vi'], toolsGroup2['vi'], toolsGroup3['vi'], toolsGroup4['vi']),
 }
 
 const i18n = createI18n({

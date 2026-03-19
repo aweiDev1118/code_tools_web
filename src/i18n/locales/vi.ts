@@ -84,6 +84,7 @@ export default {
     network: 'Mạng',
     calculator: 'Máy tính',
     dev: 'Tiện ích dev',
+    converter: 'Chuyển đổi',
   },
   tool: {
     'json-formatter': { name: 'JSON Formatter', desc: 'Làm đẹp, nén, xác thực JSON' },
@@ -134,6 +135,7 @@ export default {
     'color-palette': { name: 'Bảng màu', desc: 'Tạo bảng màu từ màu cơ bản' },
     'json-schema': { name: 'JSON Schema', desc: 'Tạo JSON Schema từ JSON' },
     'emoji-picker': { name: 'Emoji Picker', desc: 'Tìm kiếm và sao chép Emoji' },
+    'pdf-converter': { name: 'Chuyển đổi PDF', desc: 'PDF sang ảnh/Word, ảnh sang PDF' },
   },
   changelog: {
     title: 'Nhật ký thay đổi',
@@ -146,6 +148,12 @@ export default {
       docs: 'Tài liệu',
     },
     entries: {
+      v210: {
+        feat1: 'Thêm công cụ chuyển đổi PDF (PDF→ảnh, PDF→Word, ảnh→PDF)',
+        feat2: 'Hỗ trợ render PDF từng trang sang PNG/JPG, tùy chỉnh tỷ lệ và chất lượng',
+        feat3: 'Trích xuất văn bản PDF và xuất ra tài liệu Word',
+        feat4: 'Thêm danh mục "Chuyển đổi" công cụ',
+      },
       v201: {
         fix1: 'Công cụ tra cứu IP chuyển sang multi-provider fallback (hoạt động tại Trung Quốc)',
         fix2: 'Tra cứu vị trí IP chuyển sang ip-api.com + ipwho.is nguồn kép',

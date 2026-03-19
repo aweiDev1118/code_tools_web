@@ -16,6 +16,22 @@ interface ChangelogEntry {
 
 const changelog: readonly ChangelogEntry[] = [
   {
+    version: '2.1.0',
+    date: '2026-03-19',
+    type: 'minor',
+    changes: [
+      {
+        category: 'feat',
+        items: [
+          t('changelog.entries.v210.feat1'),
+          t('changelog.entries.v210.feat2'),
+          t('changelog.entries.v210.feat3'),
+          t('changelog.entries.v210.feat4'),
+        ],
+      },
+    ],
+  },
+  {
     version: '2.0.1',
     date: '2026-03-19',
     type: 'patch',

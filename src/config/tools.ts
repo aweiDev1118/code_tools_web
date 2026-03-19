@@ -25,6 +25,7 @@ export const categories: Category[] = [
   { id: 'network', name: '网络工具', icon: 'Connection' },
   { id: 'calculator', name: '计算工具', icon: 'Odometer' },
   { id: 'dev', name: '开发辅助', icon: 'SetUp' },
+  { id: 'converter', name: '格式转换', icon: 'Files' },
 ]
 
 export const tools: Tool[] = [
@@ -415,6 +416,16 @@ export const tools: Tool[] = [
     icon: 'StarFilled',
     category: 'generator',
     keywords: ['emoji', '表情', '符号', '颜文字', 'emoticon']
+  },
+
+  // 格式转换
+  {
+    id: 'pdf-converter',
+    name: 'PDF 转换工具',
+    description: 'PDF 转图片、Word，图片转 PDF',
+    icon: 'Document',
+    category: 'converter',
+    keywords: ['pdf', '转换', '图片', 'word', 'docx', 'png', 'jpg', 'convert', '文件']
   },
 
   // 开发辅助

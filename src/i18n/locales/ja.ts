@@ -84,6 +84,7 @@ export default {
     network: 'ネットワーク',
     calculator: '計算ツール',
     dev: '開発ユーティリティ',
+    converter: 'フォーマット変換',
   },
   tool: {
     'json-formatter': { name: 'JSON フォーマッタ', desc: 'JSON の整形・圧縮・検証' },
@@ -134,6 +135,7 @@ export default {
     'color-palette': { name: 'カラーパレット', desc: 'ベースカラーからパレットを生成' },
     'json-schema': { name: 'JSON Schema', desc: 'JSON から JSON Schema を生成' },
     'emoji-picker': { name: 'Emoji ピッカー', desc: 'Emoji の検索とコピー' },
+    'pdf-converter': { name: 'PDF 変換ツール', desc: 'PDF を画像・Word に変換、画像を PDF に変換' },
   },
   changelog: {
     title: '更新履歴',
@@ -146,6 +148,12 @@ export default {
       docs: 'ドキュメント',
     },
     entries: {
+      v210: {
+        feat1: 'PDF 変換ツールを追加（PDF→画像、PDF→Word、画像→PDF）',
+        feat2: 'PDF をページごとに PNG/JPG にレンダリング、倍率・品質調整可能',
+        feat3: 'PDF テキスト抽出と Word ドキュメントへのエクスポート',
+        feat4: '「フォーマット変換」カテゴリを追加',
+      },
       v201: {
         fix1: 'IP 検索ツールをマルチプロバイダ fallback に変更（中国からもアクセス可能）',
         fix2: 'IP 位置情報を ip-api.com + ipwho.is デュアルソースに切替',

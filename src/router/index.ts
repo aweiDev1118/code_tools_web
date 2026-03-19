@@ -282,6 +282,11 @@ const routes: RouteRecordRaw[] = [
     name: 'EmojiPicker',
     component: () => import('@/views/tools/EmojiPicker.vue')
   },
+  {
+    path: '/tool/pdf-converter',
+    name: 'PdfConverter',
+    component: () => import('@/views/tools/PdfConverter.vue')
+  },
 ]
 
 const router = createRouter({

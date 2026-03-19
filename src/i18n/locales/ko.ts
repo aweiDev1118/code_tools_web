@@ -84,6 +84,7 @@ export default {
     network: '네트워크',
     calculator: '계산기',
     dev: '개발 유틸리티',
+    converter: '형식 변환',
   },
   tool: {
     'json-formatter': { name: 'JSON 포맷터', desc: 'JSON 정리, 압축, 검증' },
@@ -134,6 +135,7 @@ export default {
     'color-palette': { name: '색상 팔레트', desc: '기본 색상으로 팔레트 생성' },
     'json-schema': { name: 'JSON Schema', desc: 'JSON으로 JSON Schema 생성' },
     'emoji-picker': { name: 'Emoji 선택기', desc: 'Emoji 검색 및 복사' },
+    'pdf-converter': { name: 'PDF 변환 도구', desc: 'PDF를 이미지/Word로, 이미지를 PDF로 변환' },
   },
   changelog: {
     title: '변경 이력',
@@ -146,6 +148,12 @@ export default {
       docs: '문서',
     },
     entries: {
+      v210: {
+        feat1: 'PDF 변환 도구 추가 (PDF→이미지, PDF→Word, 이미지→PDF)',
+        feat2: 'PDF 페이지별 PNG/JPG 렌더링, 배율 및 품질 조절 지원',
+        feat3: 'PDF 텍스트 추출 및 Word 문서로 내보내기',
+        feat4: '"형식 변환" 도구 카테고리 추가',
+      },
       v201: {
         fix1: 'IP 조회 도구를 다중 제공자 fallback으로 변경 (중국에서도 접속 가능)',
         fix2: 'IP 위치 조회를 ip-api.com + ipwho.is 이중 소스로 전환',

@@ -84,6 +84,7 @@ export default {
     network: '網路工具',
     calculator: '計算工具',
     dev: '開發輔助',
+    converter: '格式轉換',
   },
   tool: {
     'json-formatter': { name: 'JSON 格式化', desc: 'JSON 美化、壓縮、校驗' },
@@ -134,6 +135,7 @@ export default {
     'color-palette': { name: '調色盤生成', desc: '從基礎色生成完整調色盤' },
     'json-schema': { name: 'JSON Schema', desc: '從 JSON 生成 JSON Schema 定義' },
     'emoji-picker': { name: 'Emoji 選擇器', desc: 'Emoji 表情搜尋與複製' },
+    'pdf-converter': { name: 'PDF 轉換工具', desc: 'PDF 轉圖片、Word，圖片轉 PDF' },
   },
   changelog: {
     title: '更新日誌',
@@ -146,6 +148,12 @@ export default {
       docs: '文件',
     },
     entries: {
+      v210: {
+        feat1: '新增 PDF 轉換工具（PDF 轉圖片、PDF 轉 Word、圖片轉 PDF）',
+        feat2: '支援 PDF 逐頁渲染為 PNG/JPG，可調縮放和品質',
+        feat3: '支援 PDF 文字提取並匯出為 Word 文件',
+        feat4: '新增「格式轉換」工具分類',
+      },
       v201: {
         fix1: 'IP 查詢工具替換為多源 fallback（支援中國網路環境）',
         fix2: 'IP 歸屬地查詢切換為 ip-api.com + ipwho.is 雙源',

@@ -84,6 +84,7 @@ export default {
     network: 'Network',
     calculator: 'Calculators',
     dev: 'Dev Utils',
+    converter: 'Converter',
   },
   tool: {
     'json-formatter': { name: 'JSON Formatter', desc: 'Beautify, minify, and validate JSON' },
@@ -134,6 +135,7 @@ export default {
     'color-palette': { name: 'Color Palette', desc: 'Generate a full palette from a base color' },
     'json-schema': { name: 'JSON Schema', desc: 'Generate JSON Schema from JSON' },
     'emoji-picker': { name: 'Emoji Picker', desc: 'Search and copy emojis' },
+    'pdf-converter': { name: 'PDF Converter', desc: 'PDF to images, Word; images to PDF' },
   },
   changelog: {
     title: 'Changelog',
@@ -146,6 +148,12 @@ export default {
       docs: 'Docs',
     },
     entries: {
+      v210: {
+        feat1: 'Added PDF Converter (PDF to images, PDF to Word, images to PDF)',
+        feat2: 'PDF page-by-page rendering to PNG/JPG with scale and quality options',
+        feat3: 'PDF text extraction and export as Word document',
+        feat4: 'Added "Converter" tool category',
+      },
       v201: {
         fix1: 'IP lookup tool now uses multi-provider fallback (works in China)',
         fix2: 'IP geolocation switched to ip-api.com + ipwho.is dual providers',
