@@ -325,7 +325,7 @@ onMounted(() => {
         </el-card>
       </div>
 
-      <!-- 地图预览 -->
+      <!-- 在地图中查看 -->
       <el-card v-if="ipInfo && ipInfo.lat && ipInfo.lon" class="mt-4">
         <template #header>
           <div class="card-header">
@@ -333,16 +333,34 @@ onMounted(() => {
             <span>{{ t('tool.ip-lookup.locationPreview') }}</span>
           </div>
         </template>
-        <div class="map-container">
-          <iframe
-            :src="`https://www.openstreetmap.org/export/embed.html?bbox=${ipInfo.lon - 0.5},${ipInfo.lat - 0.3},${ipInfo.lon + 0.5},${ipInfo.lat + 0.3}&layer=mapnik&marker=${ipInfo.lat},${ipInfo.lon}`"
-            width="100%"
-            height="300"
-            style="border: 0; border-radius: 8px;"
-            allowfullscreen
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-          ></iframe>
+        <div class="map-links">
+          <a
+            :href="`https://uri.amap.com/marker?position=${ipInfo.lon},${ipInfo.lat}&name=IP: ${ipInfo.ip}`"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="map-link-btn amap"
+          >
+            <el-icon><Position /></el-icon>
+            {{ t('tool.ip-lookup.openAmap') }}
+          </a>
+          <a
+            :href="`https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}`"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="map-link-btn google"
+          >
+            <el-icon><Position /></el-icon>
+            {{ t('tool.ip-lookup.openGoogle') }}
+          </a>
+          <a
+            :href="`https://www.openstreetmap.org/?mlat=${ipInfo.lat}&mlon=${ipInfo.lon}#map=12/${ipInfo.lat}/${ipInfo.lon}`"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="map-link-btn osm"
+          >
+            <el-icon><Position /></el-icon>
+            OpenStreetMap
+          </a>
         </div>
       </el-card>
     </template>
@@ -469,9 +487,56 @@ onMounted(() => {
   color: #f3f4f6;
 }
 
-.map-container {
+.map-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.map-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
   border-radius: 8px;
-  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.16s ease;
+  border: 1px solid;
+}
+
+.map-link-btn.amap {
+  color: #1677ff;
+  background: rgba(22, 119, 255, 0.06);
+  border-color: rgba(22, 119, 255, 0.2);
+}
+
+.map-link-btn.amap:hover {
+  background: rgba(22, 119, 255, 0.12);
+  border-color: rgba(22, 119, 255, 0.4);
+}
+
+.map-link-btn.google {
+  color: #ea4335;
+  background: rgba(234, 67, 53, 0.06);
+  border-color: rgba(234, 67, 53, 0.2);
+}
+
+.map-link-btn.google:hover {
+  background: rgba(234, 67, 53, 0.12);
+  border-color: rgba(234, 67, 53, 0.4);
+}
+
+.map-link-btn.osm {
+  color: #7ebc6f;
+  background: rgba(126, 188, 111, 0.06);
+  border-color: rgba(126, 188, 111, 0.2);
+}
+
+.map-link-btn.osm:hover {
+  background: rgba(126, 188, 111, 0.12);
+  border-color: rgba(126, 188, 111, 0.4);
 }
 
 /* 移动端适配 */
