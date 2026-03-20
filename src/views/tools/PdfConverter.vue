@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import * as pdfjsLib from 'pdfjs-dist'
-import { Document, Packer, Paragraph, TextRun } from 'docx'
+import { Document, Packer, Paragraph, TextRun, AlignmentType, PageBreak } from 'docx'
 import { saveAs } from 'file-saver'
 import { jsPDF } from 'jspdf'
 
@@ -167,35 +167,113 @@ const clearPdfToImages = () => {
 
 // ==================== Tab 2 逻辑 ====================
 
+// 富文本项：保留字体大小、加粗、斜体信息
+interface RichTextItem {
+  str: string
+  fontSize: number
+  bold: boolean
+  italic: boolean
+  x: number
+  y: number
+}
+
+// 一行文本
+interface TextLine {
+  y: number
+  fontSize: number
+  items: RichTextItem[]
+}
+
+// 一页的富文本数据
+interface PageRichData {
+  lines: TextLine[]
+  pageWidth: number
+}
+
+// 存储富文本数据用于生成 docx
+const pdfRichPages = ref<PageRichData[]>([])
+const pdfWordFileName = ref('')
+
 const handlePdfToWord = async (uploadFile: { raw: File }) => {
   const file = uploadFile.raw
   if (!file || !validateFileSize(file)) return false
 
   pdfToWordLoading.value = true
   pdfTextPages.value = []
+  pdfRichPages.value = []
+  pdfWordFileName.value = file.name.replace(/\.pdf$/i, '')
 
   try {
     const arrayBuffer = await readFileAsArrayBuffer(file)
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
     const numPages = pdf.numPages
-    // 逐页提取文本，最终一次性赋值给 ref
-    const extractPage = async (pageNum: number): Promise<string> => {
+
+    const extractPage = async (pageNum: number): Promise<{ text: string; rich: PageRichData }> => {
       const page = await pdf.getPage(pageNum)
+      const viewport = page.getViewport({ scale: 1 })
       const textContent = await page.getTextContent()
-      return textContent.items
-        .map((item: any) => ('str' in item ? item.str : ''))
-        .join('')
+      const styles = textContent.styles as Record<string, any>
+
+      // 提取带样式的文本项
+      const richItems: RichTextItem[] = textContent.items
+        .filter((item: any) => 'str' in item && item.str.trim())
+        .map((item: any) => {
+          const fontName = (item.fontName || '') as string
+          const style = styles[fontName] || {}
+          const fontFamily = ((style.fontFamily || fontName) as string).toLowerCase()
+          const isBold = fontFamily.includes('bold') || (item.fontName || '').toLowerCase().includes('bold')
+          const isItalic = fontFamily.includes('italic') || fontFamily.includes('oblique')
+          // transform[3] 近似字体大小（PDF 单位）
+          const fontSize = Math.abs(item.transform[3]) || 12
+          return {
+            str: item.str as string,
+            fontSize: Math.round(fontSize),
+            bold: isBold,
+            italic: isItalic,
+            x: item.transform[4] as number,
+            y: item.transform[5] as number,
+          }
+        })
+
+      // 按 Y 坐标分组为行（Y 差值 < 3 视为同一行）
+      const lines: TextLine[] = []
+      for (const item of richItems) {
+        const existing = lines.find(l => Math.abs(l.y - item.y) < 3)
+        if (existing) {
+          existing.items = [...existing.items, item]
+        } else {
+          lines.push({ y: item.y, fontSize: item.fontSize, items: [item] })
+        }
+      }
+
+      // 每行内按 X 排序
+      const sortedLines = lines
+        .sort((a, b) => b.y - a.y) // PDF 坐标 Y 轴向上
+        .map(line => ({
+          ...line,
+          items: [...line.items].sort((a, b) => a.x - b.x),
+        }))
+
+      const plainText = sortedLines.map(line => line.items.map(i => i.str).join('')).join('\n')
+
+      return {
+        text: plainText,
+        rich: { lines: sortedLines, pageWidth: viewport.width },
+      }
     }
 
-    const pageNumbers = Array.from({ length: numPages }, (_, i) => i + 1)
     const pages: string[] = []
-    for (const num of pageNumbers) {
-      pages.push(await extractPage(num))
+    const richPages: PageRichData[] = []
+    for (let i = 1; i <= numPages; i++) {
+      const result = await extractPage(i)
+      pages.push(result.text)
+      richPages.push(result.rich)
     }
 
     pdfTextPages.value = [...pages]
+    pdfRichPages.value = [...richPages]
     ElMessage.success(t('tool.pdf-converter.extractSuccess'))
-  } catch (error) {
+  } catch {
     ElMessage.error(t('tool.pdf-converter.extractFailed'))
   } finally {
     pdfToWordLoading.value = false
@@ -205,43 +283,53 @@ const handlePdfToWord = async (uploadFile: { raw: File }) => {
 }
 
 const downloadAsDocx = async () => {
-  if (pdfTextPages.value.length === 0) return
+  if (pdfRichPages.value.length === 0) return
 
   try {
-    // 为每页创建段落，页与页之间添加分隔
-    const paragraphs = pdfTextPages.value.flatMap((pageText, index) => {
-      const pageParagraphs: Paragraph[] = [
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: `— ${t('tool.pdf-converter.page')} ${index + 1} —`,
-              bold: true,
-              size: 28,
-            }),
-          ],
-          spacing: { after: 200 },
-        }),
-      ]
+    const allParagraphs: Paragraph[] = []
 
-      // 按换行拆分文本
-      const lines = pageText.split('\n')
-      const lineParagraphs = lines.map(
-        (line) =>
-          new Paragraph({
-            children: [new TextRun({ text: line, size: 24 })],
-            spacing: { after: 100 },
+    pdfRichPages.value.forEach((pageData, pageIndex) => {
+      // 非首页添加分页符
+      if (pageIndex > 0) {
+        allParagraphs.push(new Paragraph({ children: [new PageBreak()] }))
+      }
+
+      for (const line of pageData.lines) {
+        // 检测是否为标题行（字体较大且居中）
+        const avgFontSize = line.items.reduce((s, i) => s + i.fontSize, 0) / line.items.length
+        const lineText = line.items.map(i => i.str).join('')
+        const firstX = line.items[0]?.x || 0
+        const isCentered = pageData.pageWidth > 0 && firstX > pageData.pageWidth * 0.3
+
+        // 构建 TextRun，保留每个文本片段的样式
+        const children: TextRun[] = line.items.map(item => {
+          const itemDocxSize = Math.round(item.fontSize * 2)
+          return new TextRun({
+            text: item.str,
+            bold: item.bold,
+            italics: item.italic,
+            size: itemDocxSize,
+            font: { name: 'SimSun' },
           })
-      )
+        })
 
-      return [...pageParagraphs, ...lineParagraphs]
+        allParagraphs.push(
+          new Paragraph({
+            children,
+            alignment: isCentered && lineText.length < 30 ? AlignmentType.CENTER : AlignmentType.LEFT,
+            spacing: { after: Math.round(avgFontSize * 8) },
+          })
+        )
+      }
     })
 
     const doc = new Document({
-      sections: [{ children: paragraphs }],
+      sections: [{ children: allParagraphs }],
     })
 
     const blob = await Packer.toBlob(doc)
-    saveAs(blob, 'converted.docx')
+    const fileName = pdfWordFileName.value || 'converted'
+    saveAs(blob, `${fileName}.docx`)
     ElMessage.success(t('tool.pdf-converter.downloadSuccess'))
   } catch (error) {
     ElMessage.error(t('tool.pdf-converter.downloadFailed'))
